@@ -2,10 +2,10 @@
 
 PyAQI is a Python script that analyzes pollution data to predict the Air Quality Index of Delhi-NCR in the upcoming week.
 
-## What is Air Quality Index?
-The air quality index (AQI) is a measure of how polluted the air in a particular region is. Public health risks increase as the AQI increases.
+## What is AQI?
+The Air Quality Index (AQI) is a measure of how polluted the air in a particular region is. Public health risks increase as the AQI increases.
 
-## How is Air Quality Index calculated in India?
+## How is AQI calculated in India?
 The National Air Quality Index considers eight pollutants:
 - PM10
 - PM2.5
