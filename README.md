@@ -15,6 +15,7 @@ The National Air Quality Index considers eight pollutants:
 - O3
 - NH3
 - Pb
+
 for which short-term National Ambient Air Quality Standards are prescribed.
 
 Based on the measured ambient concentrations, corresponding standards and likely health impact, a sub-index is calculated for each of these pollutants.
