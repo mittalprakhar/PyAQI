@@ -1,6 +1,8 @@
 import pyaqilib as lib
 
-password = 'PyAQI@42'
+mysql_password = 'PyAQI@42'
+
+admins = [('Prakhar', 'PM'), ('Keshav', 'KA')]
 
 data_delhi = [
     (2009, "Spring", 95, 185, 23, 105, 9, 44, 18, 37, 16, 44, 0.2, 1.5, 16, 29, 39, 165),
@@ -29,8 +31,11 @@ data_gurgaon = [
 ]
 
 # If database is already set up
-# db, cursor = lib.init(password=password)
+# db, cursor = lib.init(password=mysql_password)
 
 # If database is not set up
-db, cursor = lib.reset(data_delhi, data_gurgaon, password=password)
+db, cursor = lib.reset(data_delhi, data_gurgaon, password=mysql_password)
 
+lib.home(admins)
+
+db.close()
