@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b9234e8c-d9de-458b-855c-d31926c524f1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyaqilib.py" afterPath="$PROJECT_DIR$/pyaqilib.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run.py" afterPath="$PROJECT_DIR$/run.py" />
     </list>
@@ -23,23 +21,22 @@
       <file leaf-file-name="pyaqilib.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pyaqilib.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-896">
-              <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+            <state relative-caret-position="45">
+              <caret line="168" column="51" lean-forward="false" selection-start-line="168" selection-start-column="51" selection-end-line="168" selection-end-column="51" />
               <folding>
                 <element signature="e#53#209#0" expanded="false" />
                 <element signature="e#248#524#0" expanded="false" />
                 <element signature="e#561#802#0" expanded="false" />
                 <element signature="e#832#5669#0" expanded="false" />
                 <element signature="e#5756#5871#0" expanded="false" />
-                <element signature="e#5953#8637#0" expanded="false" />
-                <element signature="e#8674#10081#0" expanded="false" />
-                <element signature="e#11367#12443#0" expanded="false" />
-                <element signature="e#12469#14336#0" expanded="false" />
-                <element signature="e#14371#14842#0" expanded="false" />
-                <element signature="e#15270#16806#0" expanded="false" />
-                <element signature="e#16865#20444#0" expanded="false" />
-                <element signature="e#20489#22626#0" expanded="false" />
-                <element signature="e#22668#22965#0" expanded="false" />
+                <element signature="e#8653#10060#0" expanded="false" />
+                <element signature="e#11346#12422#0" expanded="false" />
+                <element signature="e#12448#14315#0" expanded="false" />
+                <element signature="e#14350#14821#0" expanded="false" />
+                <element signature="e#15249#16785#0" expanded="false" />
+                <element signature="e#16844#20423#0" expanded="false" />
+                <element signature="e#20468#22605#0" expanded="false" />
+                <element signature="e#22647#22944#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -48,8 +45,8 @@
       <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="440">
-              <caret line="146" column="0" lean-forward="true" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
+            <state relative-caret-position="-1345">
+              <caret line="37" column="3" lean-forward="true" selection-start-line="37" selection-start-column="3" selection-end-line="37" selection-end-column="3" />
               <folding />
             </state>
           </provider>
@@ -332,8 +329,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1280" height="709" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1280" height="709" extended-state="1" />
+    <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13423352" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901135" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -377,7 +374,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -390,31 +389,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="440">
-          <caret line="146" column="0" lean-forward="true" selection-start-line="146" selection-start-column="0" selection-end-line="146" selection-end-column="0" />
+        <state relative-caret-position="-1345">
+          <caret line="37" column="3" lean-forward="true" selection-start-line="37" selection-start-column="3" selection-end-line="37" selection-end-column="3" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pyaqilib.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-896">
-          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+        <state relative-caret-position="45">
+          <caret line="168" column="51" lean-forward="false" selection-start-line="168" selection-start-column="51" selection-end-line="168" selection-end-column="51" />
           <folding>
             <element signature="e#53#209#0" expanded="false" />
             <element signature="e#248#524#0" expanded="false" />
             <element signature="e#561#802#0" expanded="false" />
             <element signature="e#832#5669#0" expanded="false" />
             <element signature="e#5756#5871#0" expanded="false" />
-            <element signature="e#5953#8637#0" expanded="false" />
-            <element signature="e#8674#10081#0" expanded="false" />
-            <element signature="e#11367#12443#0" expanded="false" />
-            <element signature="e#12469#14336#0" expanded="false" />
-            <element signature="e#14371#14842#0" expanded="false" />
-            <element signature="e#15270#16806#0" expanded="false" />
-            <element signature="e#16865#20444#0" expanded="false" />
-            <element signature="e#20489#22626#0" expanded="false" />
-            <element signature="e#22668#22965#0" expanded="false" />
+            <element signature="e#8653#10060#0" expanded="false" />
+            <element signature="e#11346#12422#0" expanded="false" />
+            <element signature="e#12448#14315#0" expanded="false" />
+            <element signature="e#14350#14821#0" expanded="false" />
+            <element signature="e#15249#16785#0" expanded="false" />
+            <element signature="e#16844#20423#0" expanded="false" />
+            <element signature="e#20468#22605#0" expanded="false" />
+            <element signature="e#22647#22944#0" expanded="false" />
           </folding>
         </state>
       </provider>

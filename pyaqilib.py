@@ -166,7 +166,7 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
     cursor.execute("USE PyAQI;")
     db.commit()
 
-    cursor.execute("CREATE TABLE Chart(S_No integer, Category varchar(25) PRIMARY KEY NOT NULL, AQI_Min integer, \
+    cursor.execute("CREATE TABLE Chart(S_No integer, Category varchar(25), AQI_Min integer, \
                     AQI_Max integer, Description varchar(200));")
 
     cursor.execute("CREATE TABLE Delhi(Year integer NOT NULL, Season varchar(7) NOT NULL, \
