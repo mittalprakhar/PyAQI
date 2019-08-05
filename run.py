@@ -145,6 +145,6 @@ data_aqi = [
 # If database is not set up
 db, cursor = lib.reset(data_delhi, data_gurgaon, data_aqi, password=mysql_password)
 
-lib.home(admins)
+lib.home(db, cursor, admins)
 
 db.close()

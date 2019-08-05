@@ -1,5 +1,4 @@
 import mysql.connector
-from time import sleep
 
 
 def get_tables(cursor):
@@ -32,7 +31,7 @@ def add(cursor, table, data):
         print("Add Error")
 
 
-def calc(inp):
+def rawToIndices(inp):
     j = [inp[0], inp[1]]
     for i in range(2, 4):
         if inp[i] in range(0, 101):
@@ -168,72 +167,40 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
     db.commit()
 
     cursor.execute("CREATE TABLE Chart(S_No integer, Category varchar(25) PRIMARY KEY NOT NULL, AQI_Min integer, \
-                    AQI_RH integer, Description varchar(200));")
+                    AQI_Max integer, Description varchar(200));")
 
-    cursor.execute("CREATE TABLE Delhi_Raw(Year integer NOT NULL, Season varchar(7) NOT NULL, \
-                    PM10_RL integer, PM10_RH integer, PM2_5_RL integer, PM2_5_RH integer, \
-                    NO2_RL integer, NO2_RH integer, SO2_RL integer, SO2_RH integer, \
-                    O3_RL integer, O3_RH integer, CO_RL decimal(3,1), CO_RH decimal(3,1), \
-                    NH3_RL integer, NH3_RH integer, \
+    cursor.execute("CREATE TABLE Delhi(Year integer NOT NULL, Season varchar(7) NOT NULL, \
+                    PM10_Min integer, PM10_Max integer, PM2_5_Min integer, PM2_5_Max integer, \
+                    NO2_Min integer, NO2_Max integer, SO2_Min integer, SO2_Max integer, \
+                    O3_Min integer, O3_Max integer, CO_Min decimal(3,1), CO_Max decimal(3,1), \
+                    NH3_Min integer, NH3_Max integer, \
                     CONSTRAINT Valid CHECK (Year BETWEEN 1990 AND 2018 AND \
                     Season IN ('Summer', 'Monsoon', 'Winter', 'Spring') AND \
-                    PM10_RL >= 0 AND PM10_RH >= PM10_RL AND PM2_5_RL >= 0 AND PM2_5_RH >= PM2_5_RL AND \
-                    NO2_RL >= 0 AND NO2_RH >= NO2_RL AND SO2_RL >= 0 AND SO2_RH >= SO2_RL AND \
-                    O3_RL >= 0 AND O3_RH >= O3_RL AND CO_RL >= 0 AND CO_RH >= CO_RL AND \
-                    NH3_RL >= 0 AND NH3_RH >= NH3_RL), CONSTRAINT PK_DR PRIMARY KEY (Year, Season));")
+                    PM10_Min >= 0 AND PM10_Max >= PM10_Min AND PM2_5_Min >= 0 AND PM2_5_Max >= PM2_5_Min AND \
+                    NO2_Min >= 0 AND NO2_Max >= NO2_Min AND SO2_Min >= 0 AND SO2_Max >= SO2_Min AND \
+                    O3_Min >= 0 AND O3_Max >= O3_Min AND CO_Min >= 0 AND CO_Max >= CO_Min AND \
+                    NH3_Min >= 0 AND NH3_Max >= NH3_Min), CONSTRAINT PK_D PRIMARY KEY (Year, Season));")
 
-    cursor.execute("CREATE TABLE Gurgaon_Raw(Year integer NOT NULL, Season varchar(7) NOT NULL, \
-                    PM10_RL integer, PM10_RH integer, PM2_5_RL integer, PM2_5_RH integer, \
-                    NO2_RL integer, NO2_RH integer, SO2_RL integer, SO2_RH integer, \
-                    O3_RL integer, O3_RH integer, CO_RL decimal(3,1), CO_RH decimal(3,1), \
-                    NH3_RL integer, NH3_RH integer, \
+    cursor.execute("CREATE TABLE Gurgaon(Year integer NOT NULL, Season varchar(7) NOT NULL, \
+                    PM10_Min integer, PM10_Max integer, PM2_5_Min integer, PM2_5_Max integer, \
+                    NO2_Min integer, NO2_Max integer, SO2_Min integer, SO2_Max integer, \
+                    O3_Min integer, O3_Max integer, CO_Min decimal(3,1), CO_Max decimal(3,1), \
+                    NH3_Min integer, NH3_Max integer, \
                     CONSTRAINT Valid CHECK (Year BETWEEN 1990 AND 2018 AND \
                     Season IN ('Summer', 'Monsoon', 'Winter', 'Spring') AND \
-                    PM10_RL >= 0 AND PM10_RH >= PM10_RL AND PM2_5_RL >= 0 AND PM2_5_RH >= PM2_5_RL AND \
-                    NO2_RL >= 0 AND NO2_RH >= NO2_RL AND SO2_RL >= 0 AND SO2_RH >= SO2_RL AND \
-                    O3_RL >= 0 AND O3_RH >= O3_RL AND CO_RL >= 0 AND CO_RH >= CO_RL AND \
-                    NH3_RL >= 0 AND NH3_RH >= NH3_RL), CONSTRAINT PK_GR PRIMARY KEY (Year, Season));")
-
-    cursor.execute("CREATE TABLE Delhi_Calc(Year integer NOT NULL, Season varchar(7) NOT NULL, \
-                    PM10_IL integer, PM10_IH integer, PM2_5_IL integer, PM2_5_IH integer, \
-                    NO2_IL integer, NO2_IH integer, SO2_IL integer, SO2_IH integer, \
-                    O3_IL integer, O3_IH integer, CO_IL integer, CO_IH integer, \
-                    NH3_IL integer, NH3_IH integer, AQI_IL integer, AQI_IH integer, \
-                    AQI_Avg integer, Category varchar(25), \
-                    CONSTRAINT Valid CHECK (Year BETWEEN 1990 AND 2018 AND \
-                    Season IN ('Summer', 'Monsoon', 'Winter', 'Spring') AND \
-                    PM10_IL >= 0 AND PM10_IH >= PM10_IL AND PM2_5_IL >= 0 AND PM2_5_IH >= PM2_5_IL AND \
-                    NO2_IL >= 0 AND NO2_IH >= NO2_IL AND SO2_IL >= 0 AND SO2_IH >= SO2_IL AND \
-                    O3_IL >= 0 AND O3_IH >= O3_IL AND CO_IL >= 0 AND CO_IH >= CO_IL AND \
-                    NH3_IL >= 0 AND NH3_IH >= NH3_IL AND AQI_IL >= 0 AND AQI_IH >= AQI_IL),\
-                    CONSTRAINT FK_DC FOREIGN KEY (Year, Season) References Delhi_Raw (Year, Season), \
-                    CONSTRAINT PK_DC PRIMARY KEY (Year, Season));")
-
-    cursor.execute("CREATE TABLE Gurgaon_Calc(Year integer NOT NULL, Season varchar(7) NOT NULL, \
-                    PM10_IL integer, PM10_IH integer, PM2_5_IL integer, PM2_5_IH integer, \
-                    NO2_IL integer, NO2_IH integer, SO2_IL integer, SO2_IH integer, \
-                    O3_IL integer, O3_IH integer, CO_IL integer, CO_IH integer, \
-                    NH3_IL integer, NH3_IH integer, AQI_IL integer, AQI_IH integer, \
-                    AQI_Avg integer, Category varchar(25), \
-                    CONSTRAINT Valid CHECK (Year BETWEEN 1990 AND 2018 AND \
-                    Season IN ('Summer', 'Monsoon', 'Winter', 'Spring') AND \
-                    PM10_IL >= 0 AND PM10_IH >= PM10_IL AND PM2_5_IL >= 0 AND PM2_5_IH >= PM2_5_IL AND \
-                    NO2_IL >= 0 AND NO2_IH >= NO2_IL AND SO2_IL >= 0 AND SO2_IH >= SO2_IL AND \
-                    O3_IL >= 0 AND O3_IH >= O3_IL AND CO_IL >= 0 AND CO_IH >= CO_IL AND \
-                    NH3_IL >= 0 AND NH3_IH >= NH3_IL AND AQI_IL >= 0 AND AQI_IH >= AQI_IL),\
-                    CONSTRAINT FK_GC FOREIGN KEY (Year, Season) References Gurgaon_Raw (Year, Season), \
-                    CONSTRAINT PK_GC PRIMARY KEY (Year, Season));")
+                    PM10_Min >= 0 AND PM10_Max >= PM10_Min AND PM2_5_Min >= 0 AND PM2_5_Max >= PM2_5_Min AND \
+                    NO2_Min >= 0 AND NO2_Max >= NO2_Min AND SO2_Min >= 0 AND SO2_Max >= SO2_Min AND \
+                    O3_Min >= 0 AND O3_Max >= O3_Min AND CO_Min >= 0 AND CO_Max >= CO_Min AND \
+                    NH3_Min >= 0 AND NH3_Max >= NH3_Min), CONSTRAINT PK_G PRIMARY KEY (Year, Season));")
 
     db.commit()
 
     for i in dd:
-        add(cursor, "Delhi_Raw", i)
-        add(cursor, "Delhi_Calc", calc(i))
+        add(cursor, "Delhi", i)
     db.commit()
 
     for i in dg:
-        add(cursor, "Gurgaon_Raw", i)
-        add(cursor, "Gurgaon_Calc", calc(i))
+        add(cursor, "Gurgaon", i)
     db.commit()
 
     for i in da:
@@ -243,33 +210,26 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
     return db, cursor
 
 
-def home(admins):
+def home(db, cursor, admins):
+    print("\n", "-" * 30, sep="")
+    print("\nWelcome to PyAQI")
+    print("\nPyAQI is a Python script that can be used to access annual pollution data for Delhi and Gurgaon, \
+            \nand predict the Air Quality Index for the two cities in the next 5 years.")
+
     while True:
-        print("\n", "-" * 30, sep="")
-        print("\nWelcome to PyAQI")
-        print("\nPyAQI is a Python script that can be used to access annual pollution data for Delhi and Gurgaon, \
-        \nand predict the Air Quality Index for the two cities in the next 5 years.\n")
-
         while True:
-            try:
-                print("Choose login type: ")
-                print("\t1. User")
-                print("\t2. Admin")
-                inp = input("\nEnter 1 or 2: ")
-                inp = inp.lower()
-                if inp not in ['1', '2', 'user', 'admin']:
-                    print("\nInvalid input.\n")
-                    sleep(1)
-                else:
-                    break
-            except ValueError:
+            print("\nChoose login type: ")
+            print("\t1. User")
+            print("\t2. Admin")
+            print("\t3. Quit")
+            inp = input("\nEnter 1, 2 or 3: ")
+            inp = inp.lower()
+            if inp not in ['1', '2', '3', 'user', 'admin', 'quit', 'exit']:
                 print("\nInvalid input.\n")
-                sleep(1)
+            else:
+                break
 
-        if inp in ['1', 'user']:
-            break
-
-        else:
+        if inp in ['2', 'admin']:
             username = input("\nEnter username: ")
             password = input("Enter password: ")
             success = False
@@ -281,124 +241,382 @@ def home(admins):
                 break
             else:
                 print("\nIncorrect username or password.")
-                sleep(1)
+        else:
+            break
 
     if inp in ['1', 'user']:
         print("\nLogging in as user...")
-        user(admins)
-
-    else:
+        user(db, cursor, admins)
+    elif inp in ['2', 'admin']:
         print("\nLogging in as admin...")
-        admin(admins)
+        admin(db, cursor, admins)
+    else:
+        print("\nThank you.")
+        quit()
 
 
-def user(admins):
+def user(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nUser Menu: \n")
     while True:
-        try:
-            print("Choose task: ")
-            print("\t1. Access Data")
-            print("\t2. See Trends")
-            print("\t3. See Predictions")
-            print("\t4. Information")
-            print("\t5. Go Back")
-            inp = input("\nEnter 1, 2, 3, 4 or 5: ")
-            inp = inp.lower()
-            if inp not in ['1', '2', '3', '4', '5', 'access', 'data', 'access data', 'trends', 'see trends',
-                           'trend', 'see trend', 'predictions', 'prediction', 'see predictions', 'see prediction',
-                           'info', 'information', 'see info', 'see information', 'back', 'go back']:
-                print("\nInvalid input.\n")
-                sleep(1)
-            else:
-                break
-        except ValueError:
+        print("Choose task: ")
+        print("\t1. Access Data")
+        print("\t2. See Trends")
+        print("\t3. See Predictions")
+        print("\t4. Information")
+        print("\t5. Go Back")
+        inp = input("\nEnter 1, 2, 3, 4 or 5: ")
+        inp = inp.lower()
+        if inp not in ['1', '2', '3', '4', '5', 'access', 'data', 'access data', 'trends', 'see trends',
+                       'trend', 'see trend', 'predictions', 'prediction', 'see predictions', 'see prediction',
+                       'info', 'information', 'see info', 'see information', 'back', 'go back']:
             print("\nInvalid input.\n")
-            sleep(1)
+        else:
+            break
 
     if inp in ['1', 'access', 'data', 'access data']:
-        access(admins)
+        access(db, cursor, admins)
     elif inp in ['2', 'trends', 'see trends', 'trend', 'see trend']:
-        trends(admins)
+        trends(db, cursor, admins)
     elif inp in ['3',  'predictions', 'prediction', 'see predictions', 'see prediction']:
-        predictions(admins)
+        predictions(db, cursor, admins)
     elif inp in ['4', 'info', 'information', 'see info', 'see information']:
-        info(admins)
+        info(db, cursor, admins)
     else:
-        home(admins)
+        home(db, cursor, admins)
 
 
-def admin(admins):
+def admin(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nAdmin Menu: \n")
     while True:
-        try:
-            print("Choose task: ")
-            print("\t1. Add Data")
-            print("\t2. Modify Data")
-            print("\t3. Delete Data")
-            print("\t4. SQL Interface")
-            print("\t5. Log Out")
-            inp = input("\nEnter 1, 2, 3, 4 or 5: ")
-            inp = inp.lower()
-            if inp not in ['1', '2', '3', '4', '5', 'add', 'add data', 'modify', 'modify data', 'delete', 'delete data'
-                           'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out']:
-                print("\nInvalid input.\n")
-                sleep(1)
-            else:
-                break
-        except ValueError:
+        print("Choose task: ")
+        print("\t1. Add Data")
+        print("\t2. Modify Data")
+        print("\t3. Delete Data")
+        print("\t4. SQL Interface")
+        print("\t5. Log Out")
+        inp = input("\nEnter 1, 2, 3, 4 or 5: ")
+        inp = inp.lower()
+        if inp not in ['1', '2', '3', '4', '5', 'add', 'add data', 'modify', 'modify data', 'delete', 'delete data'
+                       'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out']:
             print("\nInvalid input.\n")
-            sleep(1)
+        else:
+            break
 
     if inp in ['1', 'add', 'add data']:
-        admin_add(admins)
+        admin_add(db, cursor, admins)
     elif inp in ['2', 'modify', 'modify data']:
-        admin_modify(admins)
+        admin_modify(db, cursor, admins)
     elif inp in ['3', 'delete', 'delete data']:
-        admin_delete(admins)
+        admin_delete(db, cursor, admins)
     elif inp in ['4', 'sql', 'mysql', 'sql interface', 'mysql interface']:
-        admin_sql(admins)
+        admin_sql(db, cursor, admins)
     else:
         print("\nLogging out...")
-        home(admins)
+        home(db, cursor, admins)
 
 
-def access(admins):
+def inp_primary():
+    print("\nTip: Type X to go back\n")
+    while True:
+        try:
+            print("Choose city: ")
+            print("\t1. Delhi")
+            print("\t2. Gurgaon")
+            city = input("\nEnter 1 or 2: ")
+            if city.lower() == "x":
+                return "x"
+            elif int(city) == 1 or city.lower() == "delhi":
+                city = "Delhi"
+                break
+            elif int(city) == 2 or city.lower() == "gurgaon":
+                city = "Gurgaon"
+                break
+            else:
+                print("\nInvalid input.\n")
+        except ValueError:
+            print("\nInvalid input.\n")
+
+    while True:
+        try:
+            year = input("\nEnter year: ")
+            if year.lower() == "x":
+                return "x"
+            else:
+                year = int(year)
+                break
+        except ValueError:
+            print("\nInvalid input.")
+
+    while True:
+        try:
+            print("\nChoose season: ")
+            print("\t1. Spring")
+            print("\t2. Summer")
+            print("\t3. Monsoon")
+            print("\t4. Winter")
+            season = input("\nEnter 1, 2, 3 or 4: ")
+            if season.lower() == "x":
+                return "x"
+            elif int(season) == 1 or season.lower() == "spring":
+                season = "Spring"
+                break
+            elif int(season) == 2 or season.lower() == "summer":
+                season = "Summer"
+                break
+            elif int(season) == 3 or season.lower() == "monsoon":
+                season = "Monsoon"
+                break
+            elif int(season) == 4 or season.lower() == "winter":
+                season = "Winter"
+                break
+            else:
+                print("\nInvalid input.")
+        except ValueError:
+            print("\nInvalid input.")
+    return city, year, season
+
+
+def inp_value(column, min):
+    while True:
+        try:
+            string = column + " value: "
+            inp = input(string)
+            if inp.lower() == "null" or int(inp) == -1:
+                return -1
+            elif float(inp) < min:
+                print("Value must be above " + str(min) + "." + "\n")
+            elif column[:3] == "CO_":
+                return float(inp)
+            else:
+                return int(inp)
+        except ValueError:
+            print("Invalid input.\n")
+
+
+def access(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nAccess Data\n")
 
 
-def trends(admins):
+def trends(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nTrends\n")
 
 
-def predictions(admins):
+def predictions(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nPredictions\n")
 
 
-def info(admins):
+def info(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nInformation\n")
 
 
-def admin_add(admins):
+def admin_add(db, cursor, admins):
     print("\n", "-" * 30, sep="")
-    print("\nAdd Data\n")
+    print("\nAdd Data")
+    prim = inp_primary()
+    if prim == "x":
+        admin(db, cursor, admins)
+    else:
+        city, year, season = prim[0], prim[1], prim[2]
+        query = "SELECT * from " + city + ";"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        flag = False
+        for i in result:
+            if i[0] == year and i[1] == season:
+                flag = True
+        if flag:
+            while True:
+                inp = input("\nRecord already exists. Do you wish to modify record instead? (Y/N): ")
+                if inp.lower() in ["yes", "y", "yeah"]:
+                    admin_modify(db, cursor, admins, primary=prim)
+                    break
+                elif inp.lower() in ["no", "n", "nah"]:
+                    print("\nRedirecting to Admin menu...")
+                    admin(db, cursor, admins)
+                    break
+                else:
+                    print("Please enter Y or N.")
+        else:
+            print("\nAccepting Values (Type Null or -1 if value missing):\n")
+            array = [year, season]
+            for i in get_columns(cursor, city):
+                if i not in ["Year", "Season"]:
+                    if len(array) % 2 == 0:
+                        min = 0
+                    else:
+                        min = array[-1]
+                    array.append(inp_value(i, min))
+            add(cursor, city, array)
+            db.commit()
+            print("\nTable updated.")
+            admin(db, cursor, admins)
 
 
-def admin_modify(admins):
+def admin_modify(db, cursor, admins, primary=None):
     print("\n", "-" * 30, sep="")
-    print("\nModify Data\n")
+    print("\nModify Data")
+    city, year, season = "", 0, 0
+    if primary is None:
+        prim = inp_primary()
+        if prim == "x":
+            admin(db, cursor, admins)
+        else:
+            city, year, season = prim[0], prim[1], prim[2]
+    else:
+        city, year, season = primary[0], primary[1], primary[2]
+    while True:
+        print("\nChoose an option:\n")
+        print("\t1. Single column")
+        print("\t2. Several columns")
+        print("\t3. Go back")
+        inp = input("\nEnter 1, 2 or 3: ")
+        inp = inp.lower()
+        if inp not in ['1', '2', '3', 'single', 'several', 'multiple', 'back', 'quit', 'exit']:
+            print("\nInvalid input.\n")
+        else:
+            break
+    if inp in ['1', 'single']:
+        while True:
+            try:
+                print("\nChoose column: ")
+                sno = 1
+                col_list = get_columns(cursor, city)[2:]
+                for i in col_list:
+                    print("\t " + str(sno) + ". " + i)
+                    sno += 1
+                cno = int(input("\nEnter column number: "))
+                if 0 < cno < len(col_list) + 1:
+                    break
+                else:
+                    print("\nInvalid input.")
+            except ValueError:
+                print("\nInvalid input.")
+        column = col_list[cno - 1]
+        flag = True
+        while flag:
+            try:
+                string = "\nEnter new value for " + column + ": "
+                inp = input(string)
+                if column[-3:] == "Min":
+                    query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+                    cursor.execute(query)
+                    result = cursor.fetchall()
+                    for i in result:
+                        if float(inp) <= i[cno + 2]:
+                            flag = False
+                        else:
+                            print("\nValue must be below " + str(i[cno + 2]) + ".")
+                elif column[-3:] == "Max":
+                    query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+                    cursor.execute(query)
+                    result = cursor.fetchall()
+                    for i in result:
+                        if float(inp) >= i[cno]:
+                            flag = False
+                        else:
+                            print("\nValue must be above " + str(i[cno]) + ".")
+                else:
+                    break
+            except ValueError:
+                print("\nInvalid input.")
+        query = "UPDATE " + city + " SET " + column + " = " + inp + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+        cursor.execute(query)
+        db.commit()
+        print("\nTable updated.")
+
+    elif inp in ['2', 'several', 'multiple']:
+        print("\nAccepting Values (Type Null or -1 if value missing):\n")
+        array = [year, season]
+        for i in get_columns(cursor, city):
+            if i not in ["Year", "Season"]:
+                if get_columns(cursor, city)[len(array)][-3:] == "Max":
+                    min = array[-1]
+                else:
+                    min = 0
+                array.append(inp_value(i, min))
+        query = "DELETE FROM " + city + " WHERE Year = " + str(year) + ' AND Season LIKE "' + season + '";'
+        cursor.execute(query)
+        db.commit()
+        add(cursor, city, array)
+        db.commit()
+        print("\nTable updated.")
+
+    admin(db, cursor, admins)
 
 
-def admin_delete(admins):
+def admin_delete(db, cursor, admins):
     print("\n", "-" * 30, sep="")
-    print("\nDelete Data\n")
+    print("\nDelete Data")
+    while True:
+        try:
+            print("\nChoose method: ")
+            print("\t1. By Primary Key")
+            print("\t2. By Condition")
+            inp = input("\nEnter 1 or 2: ")
+            if inp.lower() in ['1', 'primary', 'key', 'primary key', 'by primary key', '2', 'condition', 'by condition']:
+                break
+            else:
+                print("\nInvalid input.")
+        except ValueError:
+            print("\nInvalid input.")
+    if inp.lower() in ['1', 'primary', 'key', 'primary key', 'by primary key']:
+        prim = inp_primary()
+        if prim == "x":
+            admin(db, cursor, admins)
+        else:
+            city, year, season = prim[0], prim[1], prim[2]
+            query = "DELETE FROM " + city + " WHERE Year = " + str(year) + ' AND Season LIKE "' + season + '";'
+            cursor.execute(query)
+            db.commit()
+    else:
+        print("\nTip: Type X to go back\n")
+        while True:
+            try:
+                print("Choose city: ")
+                print("\t1. Delhi")
+                print("\t2. Gurgaon")
+                city = input("\nEnter 1 or 2: ")
+                if city.lower() == "x":
+                    city = "x"
+                    break
+                elif int(city) == 1 or city.lower() == "delhi":
+                    city = "Delhi"
+                    break
+                elif int(city) == 2 or city.lower() == "gurgaon":
+                    city = "Gurgaon"
+                    break
+                else:
+                    print("\nInvalid input.\n")
+            except ValueError:
+                print("\nInvalid input.\n")
+        if city != "x":
+            try:
+                print("\nComplete command with desired condition or Type X to go back: \n")
+                query = "DELETE FROM " + city + " WHERE "
+                inp = input(query)
+                query += inp
+                cursor.execute(query)
+                db.commit()
+                print("\nTable updated.")
+            except:
+                print("\nInvalid command.")
+    admin(db, cursor, admins)
 
 
-def admin_sql(admins):
+def admin_sql(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nSQL Interface\n")
+    try:
+        query = input("Enter SQL command: ")
+        cursor.execute(query)
+    except:
+        print("\nInvalid command.")
+        admin(db, cursor, admins)
+    print("\nCommand run successfully.")
+    admin(db, cursor, admins)
