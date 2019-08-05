@@ -1,3 +1,33 @@
+"""
+
+To Do:
+
+1. Update Data
+2. Update Calc function to:
+    a) Add 7 new Avg columns for each pollutant in both Raw and Calc tables
+    b) Add new row with primary key (Year, "Average") with average values for each year in both Raw and Calc tables
+3. Create functions to Add, Modify and Delete Data to/from Raw Tables (and automatically update Calc Tables)
+4. Add -1 in cells without value and ignore -1 during calculations, trends and predictions
+5. Link Calc Tables and Chart through Category column
+6. Create function to See Data: Either the entire table OR Values for a particular city and year (and season, optional)
+7. Create function to Display Info: Either the entire chart OR According to AQI for a particular city, year and season
+8. Create function to allow admin to run direct SQL commands
+9. Create Graph function with parameters:
+    a) City = "Delhi" / "Gurgaon" / "Both" (default)
+    b) Start Year = Earliest Year in Corresponding City's / Cities' table(s)
+    b) End Year = Latest Year in Corresponding City's / Cities' table(s)
+    c) Season = "Spring" / "Summer" / "Monsoon" / "Winter" / "Average" (default)
+    d) Columns = 3 (Min, Max, Avg) x 8 (7 pollutants + 1 AQI) = 24 possibilities
+10. Create Regression function
+11. Create Predict function that:
+    a) Uses Regression to predict 5 (4 seasons + 1 average) x 5 (2019-23) = 25 rows, each with 14 Raw values
+    b) Uses Calc to calculate corresponding 7 Raw Avg + 21 Calc + 3 AQI values (Min, Max, Avg) + Assign category
+    c) Updates all 4 tables with new predicted values
+    d) Uses Graph to display predictions
+
+"""
+
+
 import pyaqilib as lib
 
 mysql_password = 'PyAQI@42'
