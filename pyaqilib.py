@@ -1,5 +1,6 @@
 import mysql.connector
 import numpy as np
+from scipy.interpolate import make_interp_spline, BSpline
 import matplotlib.pyplot as plt
 from decimal import Decimal
 
@@ -540,40 +541,182 @@ def trends(db, cursor, admins):
                 pass
 
 
-def test(db, cursor, admins):
-    cursor.execute("SELECT * FROM Delhi ORDER BY Year, FIELD(Season, 'Spring', 'Summer', 'Monsoon', 'Winter');")
-    result = cursor.fetchall()
+def return_all(cursor, table):
+    query = "SELECT * FROM " + table + " ORDER BY Year, FIELD(Season, 'Spring', 'Summer', 'Monsoon', 'Winter');"
+    cursor.execute(query)
+    all = cursor.fetchall()
     if check_corrupted(cursor):
+        return []
+    else:
+        all_new = []
+        for i in range(len(all)):
+            row = []
+            for j in range(len(all[i])):
+                if type(all[i][j]) is Decimal:
+                    row.append(float(all[i][j]))
+                else:
+                    row.append(all[i][j])
+            all_new.append(tuple(row))
+        return all_new
+
+
+def return_years(all):
+    years = []
+    for i in range(len(all)):
+        if i % 4 == 0:
+            years += [all[i][0], all[i][0] + 0.25, all[i][0] + 0.5, all[i][0] + 0.75]
+    return years
+
+
+def return_column(all, one, two):
+    col = []
+    for i in all:
+        col.append((i[one]+i[two])/2)
+    return col
+
+
+def smooth(x1, y1):
+    x2 = np.linspace(min(x1), max(x1), 400)
+    spl = make_interp_spline(x1, y1, k=3)
+    y2 = spl(x2)
+    return x2, y2
+
+
+def test(db, cursor, admins):
+    all_d = return_all(cursor, "Delhi")
+    all_g = return_all(cursor, "Gurgaon")
+    if all_d == [] or all_g == []:
         print("Tables corrupted.")
     else:
-        result_new = []
-        for i in range(len(result)):
-            row = []
-            for j in range(len(result[i])):
-                if type(result[i][j]) is Decimal:
-                    row.append(float(result[i][j]))
-                else:
-                    row.append(result[i][j])
-            result_new.append(tuple(row))
-        result = result_new
+        years_d = return_years(all_d)
+        years_g = return_years(all_g)
 
-        years_delhi = []
-        for i in range(len(result)):
-            if i % 4 == 0:
-                years_delhi += [result[i][0], result[i][0] + 0.25, result[i][0] + 0.5, result[i][0] + 0.75]
-        print(years_delhi)
+        pm10_d = return_column(all_d, 2, 3)
+        pm10_g = return_column(all_g, 2, 3)
 
-        pm10_delhi = []
-        for i in result:
-            pm10_delhi.append(int((i[2]+i[2])/2))
-        print(pm10_delhi)
+        pm25_d = return_column(all_d, 4, 5)
+        pm25_g = return_column(all_g, 4, 5)
 
-        plt.plot(years_delhi, pm10_delhi, label="Delhi")
+        no2_d = return_column(all_d, 6, 7)
+        no2_g = return_column(all_g, 6, 7)
+
+        so2_d = return_column(all_d, 8, 9)
+        so2_g = return_column(all_g, 8, 9)
+
+        o3_d = return_column(all_d, 10, 11)
+        o3_g = return_column(all_g, 10, 11)
+
+        co_d = return_column(all_d, 12, 13)
+        co_g = return_column(all_g, 12, 13)
+
+        nh3_d = return_column(all_d, 14, 15)
+        nh3_g = return_column(all_g, 14, 15)
+
+        aqi_d = []
+        for i in all_d:
+            aqi_d.append(rawToIndices(i)[-2])
+
+        aqi_g = []
+        for i in all_g:
+            aqi_g.append(rawToIndices(i)[-2])
+
+        plt.figure(figsize=(12, 6.5))
+
+        plt.rc('axes', titlesize=9)
+        plt.rc('axes', labelsize=9)
+        plt.rc('xtick', labelsize=7)
+        plt.rc('ytick', labelsize=7)
+
+        x = [0, 1, 4]
+        y = [3, 1, 0]
+
+        plt.subplot(3, 3, 1)
+        plt.xlabel('Years')
+        plt.ylabel('PM 10')
+        xd, yd = smooth(years_d, pm10_d)
+        xg, yg = smooth(years_g, pm10_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize = 'xx-small')
+
+        plt.subplot(3, 3, 2)
+        plt.xlabel('Years')
+        plt.ylabel('PM 2.5')
+        xd, yd = smooth(years_d, pm25_d)
+        xg, yg = smooth(years_g, pm25_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 3)
+        plt.xlabel('Years')
+        plt.ylabel('NO₂')
+        xd, yd = smooth(years_d, no2_d)
+        xg, yg = smooth(years_g, no2_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 4)
+        plt.xlabel('Years')
+        plt.ylabel('SO₂')
+        xd, yd = smooth(years_d, so2_d)
+        xg, yg = smooth(years_g, so2_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 5)
+        plt.xlabel('Years')
+        plt.ylabel('O₃')
+        xd, yd = smooth(years_d, o3_d)
+        xg, yg = smooth(years_g, o3_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 6)
+        plt.xlabel('Years')
+        plt.ylabel('CO')
+        xd, yd = smooth(years_d, co_d)
+        xg, yg = smooth(years_g, co_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 7)
+        plt.xlabel('Years')
+        plt.ylabel('NH₃')
+        xd, yd = smooth(years_d, nh3_d)
+        xg, yg = smooth(years_g, nh3_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 8)
+        plt.xlabel('Years')
+        plt.ylabel('AQI')
+        xd, yd = smooth(years_d, aqi_d)
+        xg, yg = smooth(years_g, aqi_g)
+        plt.plot(xd, yd, label="Delhi")
+        plt.plot(xg, yg, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.tight_layout()
+        plt.show()
+
+    '''years_delhi_new = np.linspace(min(years_delhi), max(years_delhi), 400)
+        spl = make_interp_spline(years_delhi, pm10_delhi, k=3)
+        power_smooth = spl(years_delhi_new)
+        plt.plot(years_delhi_new, power_smooth, label="Delhi")
+
+        plt.ylim(min(pm10_delhi) - 50, max(pm10_delhi) + 50)
         plt.xlabel('Years')
         plt.ylabel('Raw Values')
         plt.title('PM10')
+
         plt.legend()
-        plt.show()
+        plt.show()'''
 
 
 def predictions(db, cursor, admins):
