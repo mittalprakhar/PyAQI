@@ -1,4 +1,7 @@
 import mysql.connector
+import numpy as np
+import matplotlib.pyplot as plt
+from decimal import Decimal
 
 
 def get_tables(cursor):
@@ -21,6 +24,11 @@ def get_columns(cursor, table):
         return column_list
     else:
         return []
+
+
+def check_corrupted(cursor):
+    cols = ['Year', 'Season', 'PM10_Min', 'PM10_Max', 'PM2_5_Min', 'PM2_5_Max', 'NO2_Min', 'NO2_Max', 'SO2_Min', 'SO2_Max', 'O3_Min', 'O3_Max', 'CO_Min', 'CO_Max', 'NH3_Min', 'NH3_Max']
+    return get_columns(cursor, "Delhi") != cols or get_columns(cursor, "Gurgaon") != cols
 
 
 def add(cursor, table, data):
@@ -225,7 +233,7 @@ def home(db, cursor, admins):
             inp = input("\nEnter 1, 2 or 3: ")
             inp = inp.lower()
             if inp not in ['1', '2', '3', 'user', 'admin', 'quit', 'exit']:
-                print("\nInvalid input.\n")
+                print("\nInvalid input.")
             else:
                 break
 
@@ -397,12 +405,175 @@ def inp_value(column, min):
 
 def access(db, cursor, admins):
     print("\n", "-" * 30, sep="")
-    print("\nAccess Data\n")
+    print("\nAccess Data")
+    prim = inp_primary()
+    if prim == "x":
+        user(db, cursor, admins)
+    else:
+        city, year, season = prim[0], prim[1], prim[2]
+        while True:
+            print("\nChoose an option:\n")
+            print("\t1. Raw values")
+            print("\t2. Sub-index values")
+            print("\t3. Go back")
+            inp = input("\nEnter 1, 2 or 3: ")
+            inp = inp.lower()
+            if inp not in ['1', '2', '3', 'raw', 'sub-index', 'raw values', 'sub-index values', 'back', 'quit', 'exit']:
+                print("\nInvalid input.\n")
+            else:
+                break
+        if inp in ['1', 'raw', 'raw values']:
+            query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+            cursor.execute(query)
+            result = cursor.fetchall()
+            if len(result) == 0:
+                print("\nNo data found.")
+            elif check_corrupted(cursor):
+                print("\nTable corrupted.")
+            else:
+                cno = 3
+                print()
+                print("1. City: \t\t" + city)
+                print("2. Year: \t\t" + str(year))
+                print("3. Season: \t\t" + season)
+                array = [year, season]
+                for j in result[0][cno-1:]:
+                    col = get_columns(cursor, city)[cno-1].replace("2_5", "2.5").replace("_", " ")
+                    unit = u"μ" + "g/m" + u"³"
+                    if col[:2] == "CO":
+                        unit = "mg/m" + u"³"
+                    print(str(cno + 1) + ". " + col + ": " + "\t" + str(result[0][cno-1]) + "\t" + unit)
+                    cno += 1
+                    if type(j) is Decimal:
+                        j = float(j)
+                    array.append(j)
+                print(str(cno + 2) + ". AQI Category: \t" + rawToIndices(array)[-1])
+        elif inp in ['2', 'sub-index', 'sub-index values']:
+            if check_corrupted(cursor):
+                print("\nTable corrupted.")
+            else:
+                array = []
+                for i in result[0]:
+                    if type(i) is Decimal:
+                        i = float(i)
+                    array.append(i)
+                indices = rawToIndices(array)
+                cols = []
+                for i in get_columns(cursor, city):
+                    cols.append(i.replace("2_5", "2.5").replace("_", " "))
+                cols += ["AQI Min", "AQI Max", "AQI Average", "AQI Category"]
+                print("\n1. City: \t\t\t" + city)
+                for cno in range(len(cols)):
+                    if cno < 2:
+                        tab = "\t\t\t"
+                    elif cno < 18:
+                        tab = "\t\t"
+                    else:
+                        tab = "\t"
+                    print(str(cno + 2) + ". " + cols[cno] + ": " + tab + str(indices[cno]))
+        user(db, cursor, admins)
 
 
 def trends(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nTrends\n")
+    print("\nTip: Type X to go back\n")
+    while True:
+        try:
+            print("Choose city: ")
+            print("\t1. Delhi")
+            print("\t2. Gurgaon")
+            print("\t3. Both")
+            city = input("\nEnter 1, 2 or 3: ")
+            if city.lower() == "x":
+                return "x"
+            elif int(city) == 1 or city.lower() == "delhi":
+                city = "Delhi"
+                break
+            elif int(city) == 2 or city.lower() == "gurgaon":
+                city = "Gurgaon"
+                break
+            elif int(city) == 3 or city.lower() == "both":
+                city = "Both"
+            else:
+                print("\nInvalid input.\n")
+        except ValueError:
+            print("\nInvalid input.\n")
+    if city == "x":
+        user(db, cursor, admins)
+    else:
+        while True:
+            try:
+                print("\nChoose season: ")
+                print("\t1. Spring")
+                print("\t2. Summer")
+                print("\t3. Monsoon")
+                print("\t4. Winter")
+                print("\t5. Average")
+                season = input("\nEnter 1, 2, 3, 4 or 5: ")
+                if season.lower() == "x":
+                    return "x"
+                elif int(season) == 1 or season.lower() == "spring":
+                    season = "Spring"
+                    break
+                elif int(season) == 2 or season.lower() == "summer":
+                    season = "Summer"
+                    break
+                elif int(season) == 3 or season.lower() == "monsoon":
+                    season = "Monsoon"
+                    break
+                elif int(season) == 4 or season.lower() == "winter":
+                    season = "Winter"
+                    break
+                elif int(season) == 5 or season.lower() == "average":
+                    season = "Average"
+                else:
+                    print("\nInvalid input.")
+            except ValueError:
+                print("\nInvalid input.")
+        if season == "x":
+            user(db, cursor, admins)
+        else:
+            if city == "Both":
+                pass
+            else:
+                pass
+
+
+def test(db, cursor, admins):
+    cursor.execute("SELECT * FROM Delhi ORDER BY Year, FIELD(Season, 'Spring', 'Summer', 'Monsoon', 'Winter');")
+    result = cursor.fetchall()
+    if check_corrupted(cursor):
+        print("Tables corrupted.")
+    else:
+        result_new = []
+        for i in range(len(result)):
+            row = []
+            for j in range(len(result[i])):
+                if type(result[i][j]) is Decimal:
+                    row.append(float(result[i][j]))
+                else:
+                    row.append(result[i][j])
+            result_new.append(tuple(row))
+        result = result_new
+
+        years_delhi = []
+        for i in range(len(result)):
+            if i % 4 == 0:
+                years_delhi += [result[i][0], result[i][0] + 0.25, result[i][0] + 0.5, result[i][0] + 0.75]
+        print(years_delhi)
+
+        pm10_delhi = []
+        for i in result:
+            pm10_delhi.append(int((i[2]+i[2])/2))
+        print(pm10_delhi)
+
+        plt.plot(years_delhi, pm10_delhi, label="Delhi")
+        plt.xlabel('Years')
+        plt.ylabel('Raw Values')
+        plt.title('PM10')
+        plt.legend()
+        plt.show()
 
 
 def predictions(db, cursor, admins):
