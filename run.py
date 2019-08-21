@@ -1,30 +1,29 @@
 """
 
+Errors:
+1. Trends / Test fails after adding / modifying / deleting data
+
 To Do:
 
 1. Update Data
-2. Create Calc function that does calculations before running Trends or Predictions
-    a) Calculates average of min and max value for each pollutant
-    b) Calculates all values for an "Average" row for each year
-    c) Uses RawToIndices to convert entire raw values table to obtain new index values table
-3. Create Graph function with parameters:
+2. Create Graph function with parameters:
     a) City = "Delhi" / "Gurgaon" / "Both" (default)
     b) Start Year = Earliest Year in Corresponding City's / Cities' table(s) (default)
     b) End Year = Latest Year in Corresponding City's / Cities' table(s) (default)
     c) Season = "Spring" / "Summer" / "Monsoon" / "Winter" / "Average" (default)
     d) Columns = 3 (Min, Max, Avg (default)) x 8 (7 pollutants + 1 AQI (default)) = 24 possibilities
-4. Create function to Display Info: Either the entire chart OR
+3. Create function to Display Info: Either the entire chart OR
     According to AQI for a particular city, year and season
     a) Use Calc to find index values, and then AQI and AQI category
     b) Display:
         i) AQI Category
         ii) Impact on Health
         iii) Dos and Donts
-5. Create Trends function that:
+4. Create Trends function that:
     a) Asks user for parameters of Graph function
     b) Uses Calc if needed to find missing values
     c) Uses Graph to output graphs with a sentence on the general "trend" for each graph
-6. Create Predict function that:
+5. Create Predict function that:
     a) Ignores values of -1
     b) Uses Regression to predict 5 (4 seasons + 1 average) x 5 (2019-23) = 25 rows, each with 14 Raw values
     c) Uses Calc to calculate corresponding 7 Raw Avg + 21 Calc + 3 AQI values (Min, Max, Avg) + Assign category
@@ -39,7 +38,7 @@ To Do:
 
 import pyaqilib as lib
 
-mysql_password = 'PyAQI@42'
+mysql_password = ''
 
 admins = [('Prakhar', 'PM'), ('Keshav', 'KA')]
 
@@ -154,8 +153,6 @@ data_aqi = [
 # If database is not set up
 db, cursor = lib.reset(data_delhi, data_gurgaon, data_aqi, password=mysql_password)
 
-# lib.home(db, cursor, admins)
-
-lib.test(db, cursor, admins)
+lib.home(db, cursor, admins)
 
 db.close()

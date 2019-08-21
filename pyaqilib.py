@@ -29,7 +29,7 @@ def get_columns(cursor, table):
 
 def check_corrupted(cursor):
     cols = ['Year', 'Season', 'PM10_Min', 'PM10_Max', 'PM2_5_Min', 'PM2_5_Max', 'NO2_Min', 'NO2_Max', 'SO2_Min', 'SO2_Max', 'O3_Min', 'O3_Max', 'CO_Min', 'CO_Max', 'NH3_Min', 'NH3_Max']
-    return get_columns(cursor, "Delhi") != cols or get_columns(cursor, "Gurgaon") != cols
+    return get_columns(cursor, "delhi") != cols or get_columns(cursor, "gurgaon") != cols
 
 
 def add(cursor, table, data):
@@ -167,18 +167,18 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
     db = mysql.connector.connect(user=user, password=password, host=host)
     cursor = db.cursor()
 
-    cursor.execute("DROP DATABASE IF EXISTS PyAQI;")
+    cursor.execute("DROP DATABASE IF EXISTS pyaqi;")
     db.commit()
 
-    cursor.execute("CREATE DATABASE PyAQI;")
+    cursor.execute("CREATE DATABASE pyaqi;")
 
-    cursor.execute("USE PyAQI;")
+    cursor.execute("USE pyaqi;")
     db.commit()
 
-    cursor.execute("CREATE TABLE Chart(S_No integer, Category varchar(25), AQI_Min integer, \
+    cursor.execute("CREATE TABLE chart(S_No integer, Category varchar(25), AQI_Min integer, \
                     AQI_Max integer, Description varchar(200));")
 
-    cursor.execute("CREATE TABLE Delhi(Year integer NOT NULL, Season varchar(7) NOT NULL, \
+    cursor.execute("CREATE TABLE delhi(Year integer NOT NULL, Season varchar(7) NOT NULL, \
                     PM10_Min integer, PM10_Max integer, PM2_5_Min integer, PM2_5_Max integer, \
                     NO2_Min integer, NO2_Max integer, SO2_Min integer, SO2_Max integer, \
                     O3_Min integer, O3_Max integer, CO_Min decimal(3,1), CO_Max decimal(3,1), \
@@ -190,7 +190,7 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
                     O3_Min >= 0 AND O3_Max >= O3_Min AND CO_Min >= 0 AND CO_Max >= CO_Min AND \
                     NH3_Min >= 0 AND NH3_Max >= NH3_Min), CONSTRAINT PK_D PRIMARY KEY (Year, Season));")
 
-    cursor.execute("CREATE TABLE Gurgaon(Year integer NOT NULL, Season varchar(7) NOT NULL, \
+    cursor.execute("CREATE TABLE gurgaon(Year integer NOT NULL, Season varchar(7) NOT NULL, \
                     PM10_Min integer, PM10_Max integer, PM2_5_Min integer, PM2_5_Max integer, \
                     NO2_Min integer, NO2_Max integer, SO2_Min integer, SO2_Max integer, \
                     O3_Min integer, O3_Max integer, CO_Min decimal(3,1), CO_Max decimal(3,1), \
@@ -205,15 +205,15 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
     db.commit()
 
     for i in dd:
-        add(cursor, "Delhi", i)
+        add(cursor, "delhi", i)
     db.commit()
 
     for i in dg:
-        add(cursor, "Gurgaon", i)
+        add(cursor, "gurgaon", i)
     db.commit()
 
     for i in da:
-        add(cursor, "Chart", i)
+        add(cursor, "chart", i)
     db.commit()
 
     return db, cursor
@@ -286,7 +286,8 @@ def user(db, cursor, admins):
     if inp in ['1', 'access', 'data', 'access data']:
         access(db, cursor, admins)
     elif inp in ['2', 'trends', 'see trends', 'trend', 'see trend']:
-        trends(db, cursor, admins)
+        # trends(db, cursor, admins)
+        test(db, cursor, admins)
     elif inp in ['3',  'predictions', 'prediction', 'see predictions', 'see prediction']:
         predictions(db, cursor, admins)
     elif inp in ['4', 'info', 'information', 'see info', 'see information']:
@@ -337,10 +338,10 @@ def inp_primary():
             if city.lower() == "x":
                 return "x"
             elif int(city) == 1 or city.lower() == "delhi":
-                city = "Delhi"
+                city = "delhi"
                 break
             elif int(city) == 2 or city.lower() == "gurgaon":
-                city = "Gurgaon"
+                city = "gurgaon"
                 break
             else:
                 print("\nInvalid input.\n")
@@ -434,7 +435,7 @@ def access(db, cursor, admins):
             else:
                 cno = 3
                 print()
-                print("1. City: \t\t" + city)
+                print("1. City: \t\t" + city.capitalize())
                 print("2. Year: \t\t" + str(year))
                 print("3. Season: \t\t" + season)
                 array = [year, season]
@@ -453,6 +454,9 @@ def access(db, cursor, admins):
             if check_corrupted(cursor):
                 print("\nTable corrupted.")
             else:
+                query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+                cursor.execute(query)
+                result = cursor.fetchall()
                 array = []
                 for i in result[0]:
                     if type(i) is Decimal:
@@ -463,10 +467,10 @@ def access(db, cursor, admins):
                 for i in get_columns(cursor, city):
                     cols.append(i.replace("2_5", "2.5").replace("_", " "))
                 cols += ["AQI Min", "AQI Max", "AQI Average", "AQI Category"]
-                print("\n1. City: \t\t\t" + city)
+                print("\n1. City: \t\t" + city.capitalize())
                 for cno in range(len(cols)):
                     if cno < 2:
-                        tab = "\t\t\t"
+                        tab = "\t\t"
                     elif cno < 18:
                         tab = "\t\t"
                     else:
@@ -475,24 +479,24 @@ def access(db, cursor, admins):
         user(db, cursor, admins)
 
 
-def trends(db, cursor, admins):
+'''def trends(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nTrends\n")
     print("\nTip: Type X to go back\n")
     while True:
         try:
             print("Choose city: ")
-            print("\t1. Delhi")
-            print("\t2. Gurgaon")
+            print("\t1. delhi")
+            print("\t2. gurgaon")
             print("\t3. Both")
             city = input("\nEnter 1, 2 or 3: ")
             if city.lower() == "x":
                 return "x"
             elif int(city) == 1 or city.lower() == "delhi":
-                city = "Delhi"
+                city = "delhi"
                 break
             elif int(city) == 2 or city.lower() == "gurgaon":
-                city = "Gurgaon"
+                city = "gurgaon"
                 break
             elif int(city) == 3 or city.lower() == "both":
                 city = "Both"
@@ -538,7 +542,7 @@ def trends(db, cursor, admins):
             if city == "Both":
                 pass
             else:
-                pass
+                pass'''
 
 
 def return_all(cursor, table):
@@ -583,8 +587,8 @@ def smooth(x1, y1):
 
 
 def test(db, cursor, admins):
-    all_d = return_all(cursor, "Delhi")
-    all_g = return_all(cursor, "Gurgaon")
+    all_d = return_all(cursor, "delhi")
+    all_g = return_all(cursor, "gurgaon")
     if all_d == [] or all_g == []:
         print("Tables corrupted.")
     else:
@@ -705,28 +709,19 @@ def test(db, cursor, admins):
         plt.tight_layout()
         plt.show()
 
-    '''years_delhi_new = np.linspace(min(years_delhi), max(years_delhi), 400)
-        spl = make_interp_spline(years_delhi, pm10_delhi, k=3)
-        power_smooth = spl(years_delhi_new)
-        plt.plot(years_delhi_new, power_smooth, label="Delhi")
-
-        plt.ylim(min(pm10_delhi) - 50, max(pm10_delhi) + 50)
-        plt.xlabel('Years')
-        plt.ylabel('Raw Values')
-        plt.title('PM10')
-
-        plt.legend()
-        plt.show()'''
+        user(db, cursor, admins)
 
 
 def predictions(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nPredictions\n")
+    user(db, cursor, admins)
 
 
 def info(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nInformation\n")
+    user(db, cursor, admins)
 
 
 def admin_add(db, cursor, admins):
@@ -900,10 +895,10 @@ def admin_delete(db, cursor, admins):
                     city = "x"
                     break
                 elif int(city) == 1 or city.lower() == "delhi":
-                    city = "Delhi"
+                    city = "delhi"
                     break
                 elif int(city) == 2 or city.lower() == "gurgaon":
-                    city = "Gurgaon"
+                    city = "gurgaon"
                     break
                 else:
                     print("\nInvalid input.\n")
