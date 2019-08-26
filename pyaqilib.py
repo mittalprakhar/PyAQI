@@ -265,6 +265,7 @@ def home(db, cursor, admins):
 
 
 def user(db, cursor, admins):
+    admin = False
     print("\n", "-" * 30, sep="")
     print("\nUser Menu: \n")
     while True:
@@ -297,6 +298,7 @@ def user(db, cursor, admins):
 
 
 def admin(db, cursor, admins):
+    admin = True
     print("\n", "-" * 30, sep="")
     print("\nAdmin Menu: \n")
     while True:
@@ -305,11 +307,18 @@ def admin(db, cursor, admins):
         print("\t2. Modify Data")
         print("\t3. Delete Data")
         print("\t4. SQL Interface")
-        print("\t5. Log Out")
-        inp = input("\nEnter 1, 2, 3, 4 or 5: ")
+        print("\t5. Access Data")
+        print("\t6. See Trends")
+        print("\t7. See Predictions")
+        print("\t8. Information")
+        print("\t9. Log Out")
+        inp = input("\nEnter option number: ")
         inp = inp.lower()
         if inp not in ['1', '2', '3', '4', '5', 'add', 'add data', 'modify', 'modify data', 'delete', 'delete data'
-                       'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out']:
+                       'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out', '6', '7', '8', '9',
+                       'access', 'data', 'access data', 'trends', 'see trends',
+                       'trend', 'see trend', 'predictions', 'prediction', 'see predictions', 'see prediction',
+                       'info', 'information', 'see info', 'see information']:
             print("\nInvalid input.\n")
         else:
             break
@@ -322,6 +331,15 @@ def admin(db, cursor, admins):
         admin_delete(db, cursor, admins)
     elif inp in ['4', 'sql', 'mysql', 'sql interface', 'mysql interface']:
         admin_sql(db, cursor, admins)
+    elif inp in ['5', 'access', 'data', 'access data']:
+        access(db, cursor, admins)
+    elif inp in ['6', 'trends', 'see trends', 'trend', 'see trend']:
+        # trends(db, cursor, admins)
+        test(db, cursor, admins)
+    elif inp in ['7',  'predictions', 'prediction', 'see predictions', 'see prediction']:
+        predictions(db, cursor, admins)
+    elif inp in ['8', 'info', 'information', 'see info', 'see information']:
+        info(db, cursor, admins)
     else:
         print("\nLogging out...")
         home(db, cursor, admins)
@@ -476,7 +494,10 @@ def access(db, cursor, admins):
                     else:
                         tab = "\t"
                     print(str(cno + 2) + ". " + cols[cno] + ": " + tab + str(indices[cno]))
-        user(db, cursor, admins)
+        if admin:
+            admin(db, cursor, admins)
+        else:
+            user(db, cursor, admins)
 
 
 '''def trends(db, cursor, admins):
@@ -709,19 +730,28 @@ def test(db, cursor, admins):
         plt.tight_layout()
         plt.show()
 
-        user(db, cursor, admins)
-
+        if admin:
+            admin(db, cursor, admins)
+        else:
+            user(db, cursor, admins)
+            
 
 def predictions(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nPredictions\n")
-    user(db, cursor, admins)
+    if admin:
+        admin(db, cursor, admins)
+    else:
+        user(db, cursor, admins)
 
 
 def info(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nInformation\n")
-    user(db, cursor, admins)
+    if admin:
+        admin(db, cursor, admins)
+    else:
+        user(db, cursor, admins)
 
 
 def admin_add(db, cursor, admins):
