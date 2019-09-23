@@ -158,7 +158,7 @@ def rawToIndices(inp):
     return j
 
 
-def init(user='root', password='PyAQI@42', host='localhost', database='PyAQI'):
+def init(user='root', password='PyAQI@42', host='localhost', database='pyaqi'):
     db = mysql.connector.connect(user=user, password=password, host=host, database=database)
     return db, db.cursor()
 
@@ -213,7 +213,7 @@ def home(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nWelcome to PyAQI")
     print("\nPyAQI is a Python script that can be used to access annual pollution data for Delhi and Gurgaon, \
-            \nand predict the Air Quality Index for the two cities in the next 5 years.")
+            \nand evaluate Air Quality Index values for the same.")
 
     while True:
         while True:
@@ -261,12 +261,13 @@ def user(db, cursor, admins, adm):
         print("Choose task: ")
         print("\t1. Access Data")
         print("\t2. See Trends")
-        print("\t3. Information")
+        print("\t3. See Information Chart")
         print("\t4. Go Back")
         inp = input("\nEnter 1, 2, 3 or 4: ")
         inp = inp.lower()
         if inp not in ['1', '2', '3', '4', 'access', 'data', 'access data', 'trends', 'see trends',
-                       'trend', 'see trend', 'info', 'information', 'see info', 'see information', 'back', 'go back']:
+                       'trend', 'see trend', 'info', 'information', 'see info', 'see information', 'see chart',
+                       'chart', 'see information chart', 'back', 'go back']:
             print("\nInvalid input.\n")
         else:
             break
@@ -275,7 +276,7 @@ def user(db, cursor, admins, adm):
         access(db, cursor, admins, adm)
     elif inp in ['2', 'trends', 'see trends', 'trend', 'see trend']:
         trends(db, cursor, admins, adm)
-    elif inp in ['3', 'info', 'information', 'see info', 'see information']:
+    elif inp in ['3', 'info', 'information', 'see info', 'see information', 'see chart', 'chart', 'see information chart']:
         info(db, cursor, admins, adm)
     else:
         home(db, cursor, admins)
@@ -292,14 +293,14 @@ def admin(db, cursor, admins, adm):
         print("\t4. SQL Interface")
         print("\t5. Access Data")
         print("\t6. See Trends")
-        print("\t7. Information")
+        print("\t7. See Information Chart")
         print("\t8. Log Out")
         inp = input("\nEnter option number: ")
         inp = inp.lower()
         if inp not in ['1', '2', '3', '4', '5', 'add', 'add data', 'modify', 'modify data', 'delete', 'delete data'
                        'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out', '6', '7', '8',
                        'access', 'data', 'access data', 'trends', 'see trends',
-                       'trend', 'see trend', 'info', 'information', 'see info', 'see information']:
+                       'trend', 'see trend', 'info', 'information', 'see info', 'see information', 'see chart', 'chart', 'see information chart']:
             print("\nInvalid input.\n")
         else:
             break
@@ -316,7 +317,7 @@ def admin(db, cursor, admins, adm):
         access(db, cursor, admins, adm)
     elif inp in ['6', 'trends', 'see trends', 'trend', 'see trend']:
         trends(db, cursor, admins, adm)
-    elif inp in ['7', 'info', 'information', 'see info', 'see information']:
+    elif inp in ['7', 'info', 'information', 'see info', 'see information', 'see chart', 'chart', 'see information chart']:
         info(db, cursor, admins, adm)
     else:
         print("\nLogging out...")
@@ -508,23 +509,36 @@ def return_all(cursor, table):
 def return_years(all):
     years = []
     for i in range(len(all)):
-        if i % 4 == 0:
-            years += [all[i][0], all[i][0] + 0.25, all[i][0] + 0.5, all[i][0] + 0.75]
+        plus = 0
+        if all[i][1] == "Summer":
+            plus = 0.25
+        elif all[i][1] == "Monsoon":
+            plus = 0.5
+        elif all[i][1] == "Winter":
+            plus = 0.75
+        years += [all[i][0] + plus]
     return years
 
 
 def return_column(all, one, two):
     col = []
     for i in all:
-        col.append((i[one]+i[two])/2)
+        onev = i[one]
+        twov = i[two]
+        if onev == -1:
+            col.append(twov * 0.7)
+        elif twov == -1:
+            col.append(onev * 1.3)
+        else:
+            col.append((i[one]+i[two])/2)
     return col
 
 
 def smooth(x1, y1):
-    x2 = np.linspace(min(x1), max(x1), 400)
-    spl = make_interp_spline(x1, y1, k=3)
-    y2 = spl(x2)
-    return x2, y2
+    # x2 = np.linspace(min(x1), max(x1), 400)
+    # spl = make_interp_spline(x1, y1, k=3)
+    # y2 = spl(x2)
+    return x1, y1
 
 
 def trends(db, cursor, admins, adm):

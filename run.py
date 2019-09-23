@@ -3,9 +3,7 @@
 To Do before submitting:
 
 1. Update Data
-2. Trends / Test fails after adding / modifying / deleting data
-Also, -1 values are not ignored currently
-3. Make See Information function: Either the entire chart OR
+2. Make See Information function: Either the entire chart OR
     According to AQI for a particular city, year and season
     a) Use Calc to find index values, and then AQI and AQI category
     b) Display:
