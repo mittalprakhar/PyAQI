@@ -29,7 +29,7 @@ def get_columns(cursor, table):
 
 def check_corrupted(cursor):
     cols = ['Year', 'Season', 'PM10_Min', 'PM10_Max', 'PM2_5_Min', 'PM2_5_Max', 'NO2_Min', 'NO2_Max', 'SO2_Min', 'SO2_Max', 'O3_Min', 'O3_Max', 'CO_Min', 'CO_Max', 'NH3_Min', 'NH3_Max']
-    return get_columns(cursor, "Delhi") != cols or get_columns(cursor, "Gurgaon") != cols
+    return get_columns(cursor, "delhi") != cols or get_columns(cursor, "gurgaon") != cols
 
 
 def add(cursor, table, data):
@@ -167,53 +167,43 @@ def reset(dd, dg, da, user='root', password='PyAQI@42', host='localhost'):
     db = mysql.connector.connect(user=user, password=password, host=host)
     cursor = db.cursor()
 
-    cursor.execute("DROP DATABASE IF EXISTS PyAQI;")
+    cursor.execute("DROP DATABASE IF EXISTS pyaqi;")
     db.commit()
 
-    cursor.execute("CREATE DATABASE PyAQI;")
+    cursor.execute("CREATE DATABASE pyaqi;")
 
-    cursor.execute("USE PyAQI;")
+    cursor.execute("USE pyaqi;")
     db.commit()
 
-    cursor.execute("CREATE TABLE Chart(S_No integer, Category varchar(25), AQI_Min integer, \
+    cursor.execute("CREATE TABLE chart(S_No integer, Category varchar(25), AQI_Min integer, \
                     AQI_Max integer, Description varchar(200));")
 
-    cursor.execute("CREATE TABLE Delhi(Year integer NOT NULL, Season varchar(7) NOT NULL, \
+    cursor.execute("CREATE TABLE delhi(Year integer NOT NULL, Season varchar(7) NOT NULL, \
                     PM10_Min integer, PM10_Max integer, PM2_5_Min integer, PM2_5_Max integer, \
                     NO2_Min integer, NO2_Max integer, SO2_Min integer, SO2_Max integer, \
                     O3_Min integer, O3_Max integer, CO_Min decimal(3,1), CO_Max decimal(3,1), \
                     NH3_Min integer, NH3_Max integer, \
-                    CONSTRAINT Valid CHECK (Year BETWEEN 1990 AND 2018 AND \
-                    Season IN ('Summer', 'Monsoon', 'Winter', 'Spring') AND \
-                    PM10_Min >= 0 AND PM10_Max >= PM10_Min AND PM2_5_Min >= 0 AND PM2_5_Max >= PM2_5_Min AND \
-                    NO2_Min >= 0 AND NO2_Max >= NO2_Min AND SO2_Min >= 0 AND SO2_Max >= SO2_Min AND \
-                    O3_Min >= 0 AND O3_Max >= O3_Min AND CO_Min >= 0 AND CO_Max >= CO_Min AND \
-                    NH3_Min >= 0 AND NH3_Max >= NH3_Min), CONSTRAINT PK_D PRIMARY KEY (Year, Season));")
+                    CONSTRAINT pk_d PRIMARY KEY (Year, Season));")
 
-    cursor.execute("CREATE TABLE Gurgaon(Year integer NOT NULL, Season varchar(7) NOT NULL, \
+    cursor.execute("CREATE TABLE gurgaon(Year integer NOT NULL, Season varchar(7) NOT NULL, \
                     PM10_Min integer, PM10_Max integer, PM2_5_Min integer, PM2_5_Max integer, \
                     NO2_Min integer, NO2_Max integer, SO2_Min integer, SO2_Max integer, \
                     O3_Min integer, O3_Max integer, CO_Min decimal(3,1), CO_Max decimal(3,1), \
                     NH3_Min integer, NH3_Max integer, \
-                    CONSTRAINT Valid CHECK (Year BETWEEN 1990 AND 2018 AND \
-                    Season IN ('Summer', 'Monsoon', 'Winter', 'Spring') AND \
-                    PM10_Min >= 0 AND PM10_Max >= PM10_Min AND PM2_5_Min >= 0 AND PM2_5_Max >= PM2_5_Min AND \
-                    NO2_Min >= 0 AND NO2_Max >= NO2_Min AND SO2_Min >= 0 AND SO2_Max >= SO2_Min AND \
-                    O3_Min >= 0 AND O3_Max >= O3_Min AND CO_Min >= 0 AND CO_Max >= CO_Min AND \
-                    NH3_Min >= 0 AND NH3_Max >= NH3_Min), CONSTRAINT PK_G PRIMARY KEY (Year, Season));")
+                    CONSTRAINT pk_g PRIMARY KEY (Year, Season));")
 
     db.commit()
 
     for i in dd:
-        add(cursor, "Delhi", i)
+        add(cursor, "delhi", i)
     db.commit()
 
     for i in dg:
-        add(cursor, "Gurgaon", i)
+        add(cursor, "gurgaon", i)
     db.commit()
 
     for i in da:
-        add(cursor, "Chart", i)
+        add(cursor, "chart", i)
     db.commit()
 
     return db, cursor
@@ -255,47 +245,43 @@ def home(db, cursor, admins):
 
     if inp in ['1', 'user']:
         print("\nLogging in as user...")
-        user(db, cursor, admins)
+        user(db, cursor, admins, False)
     elif inp in ['2', 'admin']:
         print("\nLogging in as admin...")
-        admin(db, cursor, admins)
+        admin(db, cursor, admins, True)
     else:
         print("\nThank you.")
         quit()
 
 
-def user(db, cursor, admins):
+def user(db, cursor, admins, adm):
     print("\n", "-" * 30, sep="")
     print("\nUser Menu: \n")
     while True:
         print("Choose task: ")
         print("\t1. Access Data")
         print("\t2. See Trends")
-        print("\t3. See Predictions")
-        print("\t4. Information")
-        print("\t5. Go Back")
-        inp = input("\nEnter 1, 2, 3, 4 or 5: ")
+        print("\t3. Information")
+        print("\t4. Go Back")
+        inp = input("\nEnter 1, 2, 3 or 4: ")
         inp = inp.lower()
-        if inp not in ['1', '2', '3', '4', '5', 'access', 'data', 'access data', 'trends', 'see trends',
-                       'trend', 'see trend', 'predictions', 'prediction', 'see predictions', 'see prediction',
-                       'info', 'information', 'see info', 'see information', 'back', 'go back']:
+        if inp not in ['1', '2', '3', '4', 'access', 'data', 'access data', 'trends', 'see trends',
+                       'trend', 'see trend', 'info', 'information', 'see info', 'see information', 'back', 'go back']:
             print("\nInvalid input.\n")
         else:
             break
 
     if inp in ['1', 'access', 'data', 'access data']:
-        access(db, cursor, admins)
+        access(db, cursor, admins, adm)
     elif inp in ['2', 'trends', 'see trends', 'trend', 'see trend']:
-        trends(db, cursor, admins)
-    elif inp in ['3',  'predictions', 'prediction', 'see predictions', 'see prediction']:
-        predictions(db, cursor, admins)
-    elif inp in ['4', 'info', 'information', 'see info', 'see information']:
-        info(db, cursor, admins)
+        trends(db, cursor, admins, adm)
+    elif inp in ['3', 'info', 'information', 'see info', 'see information']:
+        info(db, cursor, admins, adm)
     else:
         home(db, cursor, admins)
 
 
-def admin(db, cursor, admins):
+def admin(db, cursor, admins, adm):
     print("\n", "-" * 30, sep="")
     print("\nAdmin Menu: \n")
     while True:
@@ -304,11 +290,16 @@ def admin(db, cursor, admins):
         print("\t2. Modify Data")
         print("\t3. Delete Data")
         print("\t4. SQL Interface")
-        print("\t5. Log Out")
-        inp = input("\nEnter 1, 2, 3, 4 or 5: ")
+        print("\t5. Access Data")
+        print("\t6. See Trends")
+        print("\t7. Information")
+        print("\t8. Log Out")
+        inp = input("\nEnter option number: ")
         inp = inp.lower()
         if inp not in ['1', '2', '3', '4', '5', 'add', 'add data', 'modify', 'modify data', 'delete', 'delete data'
-                       'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out']:
+                       'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out', '6', '7', '8',
+                       'access', 'data', 'access data', 'trends', 'see trends',
+                       'trend', 'see trend', 'info', 'information', 'see info', 'see information']:
             print("\nInvalid input.\n")
         else:
             break
@@ -321,6 +312,12 @@ def admin(db, cursor, admins):
         admin_delete(db, cursor, admins)
     elif inp in ['4', 'sql', 'mysql', 'sql interface', 'mysql interface']:
         admin_sql(db, cursor, admins)
+    elif inp in ['5', 'access', 'data', 'access data']:
+        access(db, cursor, admins, adm)
+    elif inp in ['6', 'trends', 'see trends', 'trend', 'see trend']:
+        trends(db, cursor, admins, adm)
+    elif inp in ['7', 'info', 'information', 'see info', 'see information']:
+        info(db, cursor, admins, adm)
     else:
         print("\nLogging out...")
         home(db, cursor, admins)
@@ -337,10 +334,10 @@ def inp_primary():
             if city.lower() == "x":
                 return "x"
             elif int(city) == 1 or city.lower() == "delhi":
-                city = "Delhi"
+                city = "delhi"
                 break
             elif int(city) == 2 or city.lower() == "gurgaon":
-                city = "Gurgaon"
+                city = "gurgaon"
                 break
             else:
                 print("\nInvalid input.\n")
@@ -392,9 +389,11 @@ def inp_value(column, min):
         try:
             string = column + " value: "
             inp = input(string)
+            if min == -1:
+                min = 0
             if inp.lower() == "null" or int(inp) == -1:
                 return -1
-            elif float(inp) < min:
+            elif float(inp) < 0 or float(inp) < min:
                 print("Value must be above " + str(min) + "." + "\n")
             elif column[:3] == "CO_":
                 return float(inp)
@@ -404,12 +403,15 @@ def inp_value(column, min):
             print("Invalid input.\n")
 
 
-def access(db, cursor, admins):
+def access(db, cursor, admins, adm):
     print("\n", "-" * 30, sep="")
     print("\nAccess Data")
     prim = inp_primary()
     if prim == "x":
-        user(db, cursor, admins)
+        if adm:
+            admin(db, cursor, admins, adm)
+        else:
+            user(db, cursor, admins, adm)
     else:
         city, year, season = prim[0], prim[1], prim[2]
         while True:
@@ -434,7 +436,7 @@ def access(db, cursor, admins):
             else:
                 cno = 3
                 print()
-                print("1. City: \t\t" + city)
+                print("1. City: \t\t" + city.capitalize())
                 print("2. Year: \t\t" + str(year))
                 print("3. Season: \t\t" + season)
                 array = [year, season]
@@ -453,92 +455,35 @@ def access(db, cursor, admins):
             if check_corrupted(cursor):
                 print("\nTable corrupted.")
             else:
-                array = []
-                for i in result[0]:
-                    if type(i) is Decimal:
-                        i = float(i)
-                    array.append(i)
-                indices = rawToIndices(array)
-                cols = []
-                for i in get_columns(cursor, city):
-                    cols.append(i.replace("2_5", "2.5").replace("_", " "))
-                cols += ["AQI Min", "AQI Max", "AQI Average", "AQI Category"]
-                print("\n1. City: \t\t\t" + city)
-                for cno in range(len(cols)):
-                    if cno < 2:
-                        tab = "\t\t\t"
-                    elif cno < 18:
-                        tab = "\t\t"
-                    else:
-                        tab = "\t"
-                    print(str(cno + 2) + ". " + cols[cno] + ": " + tab + str(indices[cno]))
-        user(db, cursor, admins)
-
-
-def trends(db, cursor, admins):
-    print("\n", "-" * 30, sep="")
-    print("\nTrends\n")
-    print("\nTip: Type X to go back\n")
-    while True:
-        try:
-            print("Choose city: ")
-            print("\t1. Delhi")
-            print("\t2. Gurgaon")
-            print("\t3. Both")
-            city = input("\nEnter 1, 2 or 3: ")
-            if city.lower() == "x":
-                return "x"
-            elif int(city) == 1 or city.lower() == "delhi":
-                city = "Delhi"
-                break
-            elif int(city) == 2 or city.lower() == "gurgaon":
-                city = "Gurgaon"
-                break
-            elif int(city) == 3 or city.lower() == "both":
-                city = "Both"
-            else:
-                print("\nInvalid input.\n")
-        except ValueError:
-            print("\nInvalid input.\n")
-    if city == "x":
-        user(db, cursor, admins)
-    else:
-        while True:
-            try:
-                print("\nChoose season: ")
-                print("\t1. Spring")
-                print("\t2. Summer")
-                print("\t3. Monsoon")
-                print("\t4. Winter")
-                print("\t5. Average")
-                season = input("\nEnter 1, 2, 3, 4 or 5: ")
-                if season.lower() == "x":
-                    return "x"
-                elif int(season) == 1 or season.lower() == "spring":
-                    season = "Spring"
-                    break
-                elif int(season) == 2 or season.lower() == "summer":
-                    season = "Summer"
-                    break
-                elif int(season) == 3 or season.lower() == "monsoon":
-                    season = "Monsoon"
-                    break
-                elif int(season) == 4 or season.lower() == "winter":
-                    season = "Winter"
-                    break
-                elif int(season) == 5 or season.lower() == "average":
-                    season = "Average"
+                query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+                cursor.execute(query)
+                result = cursor.fetchall()
+                if len(result) == 0:
+                    print("\nNo data found.")
                 else:
-                    print("\nInvalid input.")
-            except ValueError:
-                print("\nInvalid input.")
-        if season == "x":
-            user(db, cursor, admins)
+                    array = []
+                    for i in result[0]:
+                        if type(i) is Decimal:
+                            i = float(i)
+                        array.append(i)
+                    indices = rawToIndices(array)
+                    cols = []
+                    for i in get_columns(cursor, city):
+                        cols.append(i.replace("2_5", "2.5").replace("_", " "))
+                    cols += ["AQI Min", "AQI Max", "AQI Average", "AQI Category"]
+                    print("\n1. City: \t\t" + city.capitalize())
+                    for cno in range(len(cols)):
+                        if cno < 2:
+                            tab = "\t\t"
+                        elif cno < 18:
+                            tab = "\t\t"
+                        else:
+                            tab = "\t"
+                        print(str(cno + 2) + ". " + cols[cno] + ": " + tab + str(indices[cno]))
+        if adm:
+            admin(db, cursor, admins, adm)
         else:
-            if city == "Both":
-                pass
-            else:
-                pass
+            user(db, cursor, admins, adm)
 
 
 def return_all(cursor, table):
@@ -582,9 +527,9 @@ def smooth(x1, y1):
     return x2, y2
 
 
-def test(db, cursor, admins):
-    all_d = return_all(cursor, "Delhi")
-    all_g = return_all(cursor, "Gurgaon")
+def trends(db, cursor, admins, adm):
+    all_d = return_all(cursor, "delhi")
+    all_g = return_all(cursor, "gurgaon")
     if all_d == [] or all_g == []:
         print("Tables corrupted.")
     else:
@@ -705,71 +650,66 @@ def test(db, cursor, admins):
         plt.tight_layout()
         plt.show()
 
-    '''years_delhi_new = np.linspace(min(years_delhi), max(years_delhi), 400)
-        spl = make_interp_spline(years_delhi, pm10_delhi, k=3)
-        power_smooth = spl(years_delhi_new)
-        plt.plot(years_delhi_new, power_smooth, label="Delhi")
-
-        plt.ylim(min(pm10_delhi) - 50, max(pm10_delhi) + 50)
-        plt.xlabel('Years')
-        plt.ylabel('Raw Values')
-        plt.title('PM10')
-
-        plt.legend()
-        plt.show()'''
+        if adm:
+            admin(db, cursor, admins, adm)
+        else:
+            user(db, cursor, admins, adm)
 
 
-def predictions(db, cursor, admins):
-    print("\n", "-" * 30, sep="")
-    print("\nPredictions\n")
-
-
-def info(db, cursor, admins):
+def info(db, cursor, admins, adm):
     print("\n", "-" * 30, sep="")
     print("\nInformation\n")
+    if adm:
+        admin(db, cursor, admins, adm)
+    else:
+        user(db, cursor, admins, adm)
 
 
-def admin_add(db, cursor, admins):
+def admin_add(db, cursor, admins, primary = None):
     print("\n", "-" * 30, sep="")
     print("\nAdd Data")
-    prim = inp_primary()
-    if prim == "x":
-        admin(db, cursor, admins)
-    else:
-        city, year, season = prim[0], prim[1], prim[2]
-        query = "SELECT * from " + city + ";"
-        cursor.execute(query)
-        result = cursor.fetchall()
-        flag = False
-        for i in result:
-            if i[0] == year and i[1] == season:
-                flag = True
-        if flag:
-            while True:
-                inp = input("\nRecord already exists. Do you wish to modify record instead? (Y/N): ")
-                if inp.lower() in ["yes", "y", "yeah"]:
-                    admin_modify(db, cursor, admins, primary=prim)
-                    break
-                elif inp.lower() in ["no", "n", "nah"]:
-                    print("\nRedirecting to Admin menu...")
-                    admin(db, cursor, admins)
-                    break
-                else:
-                    print("Please enter Y or N.")
+    if primary == None:
+        prim = inp_primary()
+        if prim == "x":
+            admin(db, cursor, admins, True)
         else:
-            print("\nAccepting Values (Type Null or -1 if value missing):\n")
-            array = [year, season]
-            for i in get_columns(cursor, city):
-                if i not in ["Year", "Season"]:
-                    if len(array) % 2 == 0:
-                        min = 0
-                    else:
-                        min = array[-1]
-                    array.append(inp_value(i, min))
-            add(cursor, city, array)
-            db.commit()
-            print("\nTable updated.")
-            admin(db, cursor, admins)
+            city, year, season = prim[0], prim[1], prim[2]
+    else:
+        city, year, season = primary[0], primary[1], primary[2]
+
+    query = "SELECT * from " + city + ";"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    flag = False
+    for i in result:
+        if i[0] == year and i[1] == season:
+            flag = True
+    if flag:
+        while True:
+            inp = input("\nRecord already exists. Do you wish to modify record instead? (Y/N): ")
+            if inp.lower() in ["yes", "y", "yeah"]:
+                admin_modify(db, cursor, admins, primary=prim)
+                break
+            elif inp.lower() in ["no", "n", "nah"]:
+                print("\nRedirecting to Admin menu...")
+                admin(db, cursor, admins, True)
+                break
+            else:
+                print("Please enter Y or N.")
+    else:
+        print("\nAccepting Values (Type Null or -1 if value missing):\n")
+        array = [year, season]
+        for i in get_columns(cursor, city):
+            if i not in ["Year", "Season"]:
+                if len(array) % 2 == 0:
+                    min = 0
+                else:
+                    min = array[-1]
+                array.append(inp_value(i, min))
+        add(cursor, city, array)
+        db.commit()
+        print("\nTable updated.")
+        admin(db, cursor, admins, True)
 
 
 def admin_modify(db, cursor, admins, primary=None):
@@ -779,11 +719,26 @@ def admin_modify(db, cursor, admins, primary=None):
     if primary is None:
         prim = inp_primary()
         if prim == "x":
-            admin(db, cursor, admins)
+            admin(db, cursor, admins, True)
         else:
             city, year, season = prim[0], prim[1], prim[2]
     else:
         city, year, season = primary[0], primary[1], primary[2]
+    query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
+    cursor.execute(query)
+    result = cursor.fetchall()
+    if len(result) == 0:
+        while True:
+            inp = input("\nRecord does not exist. Do you wish to add record instead? (Y/N): ")
+            if inp.lower() in ["yes", "y", "yeah"]:
+                admin_add(db, cursor, admins, primary=prim)
+                break
+            elif inp.lower() in ["no", "n", "nah"]:
+                print("\nRedirecting to Admin menu...")
+                admin(db, cursor, admins, True)
+                break
+            else:
+                print("Please enter Y or N.")
     while True:
         print("\nChoose an option:\n")
         print("\t1. Single column")
@@ -818,23 +773,21 @@ def admin_modify(db, cursor, admins, primary=None):
                 string = "\nEnter new value for " + column + ": "
                 inp = input(string)
                 if column[-3:] == "Min":
-                    query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
-                    cursor.execute(query)
-                    result = cursor.fetchall()
                     for i in result:
-                        if float(inp) <= i[cno + 2]:
+                        maxv = i[cno + 2]
+                        if float(inp) == -1 or float(inp) >= 0 and maxv == -1 or maxv >= float(inp) >= 0:
                             flag = False
                         else:
-                            print("\nValue must be below " + str(i[cno + 2]) + ".")
+                            print("\nValue must be below " + str(maxv) + ".")
                 elif column[-3:] == "Max":
-                    query = "SELECT * FROM " + city + " WHERE YEAR = " + str(year) + ' AND Season LIKE "' + season + '";'
-                    cursor.execute(query)
-                    result = cursor.fetchall()
                     for i in result:
-                        if float(inp) >= i[cno]:
+                        minv = i[cno]
+                        if minv == -1:
+                            minv = 0
+                        if float(inp) == -1 or float(inp) >= minv:
                             flag = False
                         else:
-                            print("\nValue must be above " + str(i[cno]) + ".")
+                            print("\nValue must be above " + str(minv) + ".")
                 else:
                     break
             except ValueError:
@@ -861,7 +814,7 @@ def admin_modify(db, cursor, admins, primary=None):
         db.commit()
         print("\nTable updated.")
 
-    admin(db, cursor, admins)
+    admin(db, cursor, admins, True)
 
 
 def admin_delete(db, cursor, admins):
@@ -882,11 +835,12 @@ def admin_delete(db, cursor, admins):
     if inp.lower() in ['1', 'primary', 'key', 'primary key', 'by primary key']:
         prim = inp_primary()
         if prim == "x":
-            admin(db, cursor, admins)
+            admin(db, cursor, admins, True)
         else:
             city, year, season = prim[0], prim[1], prim[2]
             query = "DELETE FROM " + city + " WHERE Year = " + str(year) + ' AND Season LIKE "' + season + '";'
             cursor.execute(query)
+            print("\nTable updated.")
             db.commit()
     else:
         print("\nTip: Type X to go back\n")
@@ -900,10 +854,10 @@ def admin_delete(db, cursor, admins):
                     city = "x"
                     break
                 elif int(city) == 1 or city.lower() == "delhi":
-                    city = "Delhi"
+                    city = "delhi"
                     break
                 elif int(city) == 2 or city.lower() == "gurgaon":
-                    city = "Gurgaon"
+                    city = "gurgaon"
                     break
                 else:
                     print("\nInvalid input.\n")
@@ -911,7 +865,7 @@ def admin_delete(db, cursor, admins):
                 print("\nInvalid input.\n")
         if city != "x":
             try:
-                print("\nComplete command with desired condition or Type X to go back: \n")
+                print("\nComplete command with desired condition or type X to go back: \n")
                 query = "DELETE FROM " + city + " WHERE "
                 inp = input(query)
                 query += inp
@@ -920,17 +874,32 @@ def admin_delete(db, cursor, admins):
                 print("\nTable updated.")
             except:
                 print("\nInvalid command.")
-    admin(db, cursor, admins)
+    admin(db, cursor, admins, True)
 
 
 def admin_sql(db, cursor, admins):
     print("\n", "-" * 30, sep="")
     print("\nSQL Interface\n")
+    flag = True
     try:
-        query = input("Enter SQL command: ")
-        cursor.execute(query)
+        query = input("Enter SQL command or type X to go back: ")
+        if query not in ["x", "X", "back", "quit"]:   
+            cursor.execute(query)
+            if query.lower().find("desc") != -1 or query.lower().find("select") != -1:
+                result = cursor.fetchall()
+                print()
+                if len(result) == 0:
+                    print("Empty set")
+                else:
+                    for i in result:
+                        print(i)
+            else:
+                db.commit()
+        else:
+            flag = False
     except:
         print("\nInvalid command.")
-        admin(db, cursor, admins)
-    print("\nCommand run successfully.")
-    admin(db, cursor, admins)
+        admin(db, cursor, admins, True)
+    if flag:
+        print("\nCommand run successfully.")
+    admin(db, cursor, admins, True)
