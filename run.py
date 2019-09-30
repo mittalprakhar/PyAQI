@@ -3,13 +3,6 @@
 To Do before submitting:
 
 1. Update Data
-2. Make See Information function: Either the entire chart OR
-    According to AQI for a particular city, year and season
-    a) Use Calc to find index values, and then AQI and AQI category
-    b) Display:
-        i) AQI Category
-        ii) Impact on Health
-        iii) Dos and Donts
 
 
 """
@@ -118,12 +111,12 @@ data_gurgaon = [
 ]
 
 data_aqi = [
-    (1, "Good", 0, 50, "People are not exposed to any health risk because the quality of air is pure."),
-    (2, "Satisfactory", 51, 100, "Pollution may cause minor discomfort to sensitive people."),
-    (3, "Moderately Polluted", 101, 200, "Pollution may cause breathing discomfort to people with lung disease, asthma, heart disease, and to children and older adults."),
-    (4, "Poor", 201, 300, "Pollution may cause breathing discomfort to people on prolonged exposure."),
-    (5, "Very Poor", 301, 400, "Pollution may cause respiratory illness to people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases."),
-    (6, "Severe", 401, 500, "Pollution may cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease.")
+    (1, "Good", 0, 50, "People are not exposed to any health risk as the air is pure."),
+    (2, "Satisfactory", 51, 100, "Minor discomfort to sensitive people."),
+    (3, "Moderately Polluted", 101, 200, "Discomfort to people with lung disease, asthma or heart disease, and to children and older adults."),
+    (4, "Poor", 201, 300, "Discomfort to people on prolonged exposure."),
+    (5, "Very Poor", 301, 400, "Respiratory illness on prolonged exposure, more pronounced in people with lung/heart disease."),
+    (6, "Severe", 401, 500, "Respiratory impact even on healthy people, and serious impact on people with lung/heart disease.")
 ]
 
 # If database is already set up

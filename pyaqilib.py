@@ -261,13 +261,12 @@ def user(db, cursor, admins, adm):
         print("Choose task: ")
         print("\t1. Access Data")
         print("\t2. See Trends")
-        print("\t3. See Information Chart")
+        print("\t3. See AQI Chart")
         print("\t4. Go Back")
         inp = input("\nEnter 1, 2, 3 or 4: ")
         inp = inp.lower()
         if inp not in ['1', '2', '3', '4', 'access', 'data', 'access data', 'trends', 'see trends',
-                       'trend', 'see trend', 'info', 'information', 'see info', 'see information', 'see chart',
-                       'chart', 'see information chart', 'back', 'go back']:
+                       'trend', 'see trend', 'see chart', 'chart', 'see aqi chart', 'aqi chart', 'back', 'go back']:
             print("\nInvalid input.\n")
         else:
             break
@@ -276,8 +275,8 @@ def user(db, cursor, admins, adm):
         access(db, cursor, admins, adm)
     elif inp in ['2', 'trends', 'see trends', 'trend', 'see trend']:
         trends(db, cursor, admins, adm)
-    elif inp in ['3', 'info', 'information', 'see info', 'see information', 'see chart', 'chart', 'see information chart']:
-        info(db, cursor, admins, adm)
+    elif inp in ['3', 'see chart', 'chart', 'see aqi chart', 'aqi chart']:
+        chart(db, cursor, admins, adm)
     else:
         home(db, cursor, admins)
 
@@ -293,14 +292,14 @@ def admin(db, cursor, admins, adm):
         print("\t4. SQL Interface")
         print("\t5. Access Data")
         print("\t6. See Trends")
-        print("\t7. See Information Chart")
+        print("\t7. See AQI Chart")
         print("\t8. Log Out")
         inp = input("\nEnter option number: ")
         inp = inp.lower()
         if inp not in ['1', '2', '3', '4', '5', 'add', 'add data', 'modify', 'modify data', 'delete', 'delete data'
                        'sql', 'mysql', 'sql interface', 'mysql interface', 'back', 'log out', '6', '7', '8',
                        'access', 'data', 'access data', 'trends', 'see trends',
-                       'trend', 'see trend', 'info', 'information', 'see info', 'see information', 'see chart', 'chart', 'see information chart']:
+                       'trend', 'see trend', 'see chart', 'chart', 'see aqi chart', 'aqi chart']:
             print("\nInvalid input.\n")
         else:
             break
@@ -317,8 +316,8 @@ def admin(db, cursor, admins, adm):
         access(db, cursor, admins, adm)
     elif inp in ['6', 'trends', 'see trends', 'trend', 'see trend']:
         trends(db, cursor, admins, adm)
-    elif inp in ['7', 'info', 'information', 'see info', 'see information', 'see chart', 'chart', 'see information chart']:
-        info(db, cursor, admins, adm)
+    elif inp in ['7', 'see chart', 'chart', 'see aqi chart', 'aqi chart']:
+        chart(db, cursor, admins, adm)
     else:
         print("\nLogging out...")
         home(db, cursor, admins)
@@ -670,9 +669,16 @@ def trends(db, cursor, admins, adm):
             user(db, cursor, admins, adm)
 
 
-def info(db, cursor, admins, adm):
+def chart(db, cursor, admins, adm):
     print("\n", "-" * 30, sep="")
     print("\nInformation\n")
+    query = "SELECT * from chart;"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    print("{0:<7}{1:<20}{2:<5}{3:<5}{4:<100}".format("S.No.", "Category", "Low", "High", "Description"))
+    print("-" * 125, sep="")
+    for i in result:
+        print("{0:<7}{1:<20}{2:<5}{3:<5}{4:<100}".format(str(i[0]), str(i[1]), str(i[2]), str(i[3]), str(i[4])))
     if adm:
         admin(db, cursor, admins, adm)
     else:
