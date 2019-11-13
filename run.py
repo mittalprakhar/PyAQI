@@ -1,9 +1,7 @@
 import mysql.connector
 import numpy as np
-from scipy.interpolate import make_interp_spline, BSpline
 import matplotlib.pyplot as plt
 from decimal import Decimal
-import pandas as pd
 
 
 def get_tables(cursor):
@@ -534,13 +532,6 @@ def return_column(all, one, two):
     return col
 
 
-def smooth(x1, y1):
-    # x2 = np.linspace(min(x1), max(x1), 400)
-    # spl = make_interp_spline(x1, y1, k=3)
-    # y2 = spl(x2)
-    return x1, y1
-
-
 def trends(db, cursor, admins, adm):
     all_d = return_all(cursor, "delhi")
     all_g = return_all(cursor, "gurgaon")
@@ -589,98 +580,57 @@ def trends(db, cursor, admins, adm):
         plt.subplot(3, 3, 1)
         plt.xlabel('Years')
         plt.ylabel('PM 10')
-        xd, yd = smooth(years_d, pm10_d)
-        xg, yg = smooth(years_g, pm10_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.plot(years_d, pm10_d, label="Delhi")
+        plt.plot(years_g, pm10_g, label="Gurgaon")
         plt.legend(loc = 2, fontsize = 'xx-small')
 
         plt.subplot(3, 3, 2)
         plt.xlabel('Years')
         plt.ylabel('PM 2.5')
-        xd, yd = smooth(years_d, pm25_d)
-        xg, yg = smooth(years_g, pm25_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.plot(years_d, pm25_d, label="Delhi")
+        plt.plot(years_g, pm25_g, label="Gurgaon")
         plt.legend(loc=2, fontsize='xx-small')
 
         plt.subplot(3, 3, 3)
         plt.xlabel('Years')
         plt.ylabel('NO₂')
-        xd, yd = smooth(years_d, no2_d)
-        xg, yg = smooth(years_g, no2_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.plot(years_d, no2_d, label="Delhi")
+        plt.plot(years_g, no2_g, label="Gurgaon")
         plt.legend(loc=2, fontsize='xx-small')
 
         plt.subplot(3, 3, 4)
         plt.xlabel('Years')
         plt.ylabel('SO₂')
-        xd, yd = smooth(years_d, so2_d)
-        xg, yg = smooth(years_g, so2_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.plot(years_d, so2_d, label="Delhi")
+        plt.plot(years_g, so2_g, label="Gurgaon")
         plt.legend(loc=2, fontsize='xx-small')
-
-        '''ax = plt.subplot(3, 3, 5)
-        plt.xlabel('Category')
-        plt.ylabel('No. of Seasons')
-        x = ['Good', 'Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
-        yd = [3, 5, 6, 7, 5, 4]
-        yg = [4, 6, 8, 7, 5, 1]
-        ax.bar(x+0.2, yd, width=0.4, label="Delhi")
-        plt.bar(x-0.2, yg, width=0.4, label="Gurgaon")
-
-        raw_data = {'Category': ['Good', 'Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe'],
-        'Delhi': [4, 2, 3, 2, 3, 4],
-        'Gurgaon': [2, 9, 5, 6, 7, 5]}
-        df = pd.DataFrame(raw_data, columns = ['Category', 'Delhi', 'Gurgaon'])
-
-        pos = list(range(len(df['Delhi']))) 
-        width = 0.25
-
-        plt.subplot(3, 3, 5)
-        # plt.ylabel('No. of Seasons')
-        # plt.set_xticks([p + 1.5 * width for p in pos])
-        # plt.set_xticklabels(df['Category'])
-        plt.bar(pos, df['Delhi'], width, label=df['Category'][0])
-        plt.bar([p + width for p in pos], df['Gurgaon'], width, label=df['Category'][1]
-        # plt.legend(['Delhi', 'Gurgaon'])'''
                 
-        plt.subplot(3, 3, 6)
+        plt.subplot(3, 3, 5)
         plt.xlabel('Years')
         plt.ylabel('CO')
-        xd, yd = smooth(years_d, co_d)
-        xg, yg = smooth(years_g, co_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.plot(years_d, co_d, label="Delhi")
+        plt.plot(years_g, co_g, label="Gurgaon")
+        plt.legend(loc=2, fontsize='xx-small')
+
+        plt.subplot(3, 3, 6)
+        plt.xlabel('Years')
+        plt.ylabel('NH₃')
+        plt.plot(years_d, nh3_d, label="Delhi")
+        plt.plot(years_g, nh3_g, label="Gurgaon")
         plt.legend(loc=2, fontsize='xx-small')
 
         plt.subplot(3, 3, 7)
         plt.xlabel('Years')
-        plt.ylabel('NH₃')
-        xd, yd = smooth(years_d, nh3_d)
-        xg, yg = smooth(years_g, nh3_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.ylabel('O₃')
+        plt.plot(years_d, o3_d, label="Delhi")
+        plt.plot(years_g, o3_g, label="Gurgaon")
         plt.legend(loc=2, fontsize='xx-small')
-
+        
         plt.subplot(3, 3, 8)
         plt.xlabel('Years')
         plt.ylabel('AQI')
-        xd, yd = smooth(years_d, aqi_d)
-        xg, yg = smooth(years_g, aqi_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
-        plt.legend(loc=2, fontsize='xx-small')
-
-        plt.subplot(3, 3, 9)
-        plt.xlabel('Years')
-        plt.ylabel('O₃')
-        xd, yd = smooth(years_d, o3_d)
-        xg, yg = smooth(years_g, o3_g)
-        plt.plot(xd, yd, label="Delhi")
-        plt.plot(xg, yg, label="Gurgaon")
+        plt.plot(years_d, aqi_d, label="Delhi")
+        plt.plot(years_g, aqi_g, label="Gurgaon")
         plt.legend(loc=2, fontsize='xx-small')
 
         plt.tight_layout()
@@ -927,7 +877,11 @@ def admin_sql(db, cursor, admins):
     try:
         query = input("Enter SQL command or type X to go back: ")
         if query not in ["x", "X", "back", "quit"]:   
-            cursor.execute(query)
+            if query.lower().find("drop") != -1:
+                print("\Drop command cannot be executed.")
+                flag = False
+            else:
+                cursor.execute(query)
             if query.lower().find("desc") != -1 or query.lower().find("select") != -1:
                 result = cursor.fetchall()
                 print()
@@ -1054,7 +1008,7 @@ data_aqi = [
 ]
 
 # If database is already set up
-# db, cursor = lib.init(password=mysql_password)
+# db, cursor = init(password=mysql_password)
 
 # If database is not set up
 db, cursor = reset(data_delhi, data_gurgaon, data_aqi, password=mysql_password)
