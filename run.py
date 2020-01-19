@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 from decimal import Decimal
 
 
+mysql_password = 'PyAQI@42'
+admins = [('Prakhar', 'PM')]
+
+
 def get_tables(cursor):
     table_list = []
     cursor.execute("SHOW TABLES;")
@@ -878,7 +882,7 @@ def admin_sql(db, cursor, admins):
         query = input("Enter SQL command or type X to go back: ")
         if query not in ["x", "X", "back", "quit"]:   
             if query.lower().find("drop") != -1:
-                print("\Drop command cannot be executed.")
+                print("\nDrop command cannot be executed.")
                 flag = False
             else:
                 cursor.execute(query)
@@ -901,10 +905,6 @@ def admin_sql(db, cursor, admins):
         print("\nCommand run successfully.")
     admin(db, cursor, admins, True)
 
-
-mysql_password = ''
-
-admins = [('Prakhar', 'PM'), ('Keshav', 'KA')]
 
 data_delhi = [
     (2009, "Spring", 57, 185, 23, 105, 9, 44, 18, 37, 16, 44, 0.2, 1.5, 16, 29),
