@@ -1,5 +1,5 @@
 # PyAQI
-PyAQI is a Python script that can be used to access annual pollution data for Delhi and Gurgaon, and calculate Air Quality Index.
+PyAQI is a CRUD application for accessing Delhi-NCR's annual pollution data and visualizing air quality trends.
 
 ## What is AQI?
 The Air Quality Index (AQI) is a measure of how polluted the air in a particular region is. Public health risks increase as the AQI increases.
